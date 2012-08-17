@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	You under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.insideout.wordlift</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>freeling-engine</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>InsideOut10 for Apache Stanbol : Freeling Enhancement Engine</name>
+	<description></description>
+
+	<inceptionYear>2012</inceptionYear>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-Activator>
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.FreelingBundleActivator
+						</Bundle-Activator>
+						<Export-Package>
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling;version=${project.version},
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;version=${project.version}
+						</Export-Package>
+						<Import-Package>
+							io.insideout.wordlift.org.apache.stanbol.domain;version=${project.version},
+							io.insideout.wordlift.org.apache.stanbol.services;version=${project.version},
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling;version=${project.version},
+							org.osgi.framework,
+							org.apache.clerezza.rdf.core,
+							org.apache.clerezza.rdf.core.access,
+							org.apache.clerezza.rdf.core.impl,
+							org.apache.stanbol.enhancer.servicesapi,
+							org.apache.stanbol.enhancer.servicesapi.helper,
+							org.apache.stanbol.enhancer.servicesapi.impl,
+							org.apache.stanbol.enhancer.servicesapi.rdf,
+							org.osgi.service.cm,
+							org.osgi.service.component,
+							org.slf4j
+						</Import-Package>
+						<Private-Package>
+							edu.upc.freeling
+						</Private-Package>
+						<Bundle-NativeCode>
+							lib/libfreeling_javaAPI.jnilib;osname=MacOSX;processor=x86;processor=x86-64
+						</Bundle-NativeCode>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-scr-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wordlift-shared</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- <dependency> <groupId>${project.groupId}</groupId> <artifactId>freeling-support-library</artifactId> 
+			<version>${project.version}</version> </dependency> -->
+		<dependency>
+			<groupId>edu.upc.freeling</groupId>
+			<artifactId>edu.upc.freeling</artifactId>
+			<version>3.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.apache.stanbol</groupId> <artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId> 
+			<version>0.10.0-incubating-SNAPSHOT</version> </dependency> -->
+		<!-- <dependency> <groupId>org.apache.stanbol</groupId> <artifactId>org.apache.stanbol.commons.stanboltools.offline</artifactId> 
+			<version>0.9.0-incubating</version> </dependency> -->
+		<!-- <dependency> <groupId>org.apache.stanbol</groupId> <artifactId>org.apache.stanbol.entityhub.servicesapi</artifactId> 
+			<version>0.11.0-incubating-SNAPSHOT</version> <scope>compile</scope> </dependency> --><!-- <dependency> <groupId>org.apache.stanbol</groupId> <artifactId>org.apache.stanbol.entityhub.model.clerezza</artifactId> 
+			<version>0.9.0-incubating</version> <scope>compile</scope> </dependency> -->
+		<!-- <dependency> <groupId>commons-io</groupId> <artifactId>commons-io</artifactId> 
+			</dependency> <dependency> <groupId>commons-lang</groupId> <artifactId>commons-lang</artifactId> 
+			</dependency> -->
+		<!-- <dependency> <groupId>org.apache.felix</groupId> <artifactId>org.apache.felix.scr.annotations</artifactId> 
+			</dependency> --><!-- <dependency> <groupId>org.apache.clerezza</groupId> <artifactId>rdf.core</artifactId> 
+			</dependency> --><!-- <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
+			</dependency> -->
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.enhancer.test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.enhancer.core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.entityhub.core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.entityhub.yard.solr</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.data.sites.dbpedia</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.enhancer.rdfentities</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- <dependency> <groupId>junit</groupId> <artifactId>junit</artifactId> 
+			</dependency> <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 
+			</dependency> -->
+	</dependencies>
+
+</project>
