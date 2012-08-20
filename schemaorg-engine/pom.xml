@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>parent</artifactId>
+		<groupId>io.insideout.wordlift</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>schemaorg-engine</artifactId>
+	<name>InsideOut10 for Apache Stanbol : A schema.org conversion engine.</name>
+	<url>http://wordlift.org</url>
+
+	<dependencies>
+		<!-- ##### T E S T - D E P E N D E N C I E S ##### -->
+		<dependency>
+			<groupId>com.hp.hpl.jena</groupId>
+			<artifactId>jena</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+</project>
