@@ -10,21 +10,90 @@
 	</parent>
 
 	<artifactId>schemaorg-engine</artifactId>
-	<name>InsideOut10 for Apache Stanbol : A schema.org conversion engine.</name>
+	<packaging>bundle</packaging>
+
+	<name>InsideOut10 for Apache Stanbol : Schema.org Refactorer engine</name>
+	<description>An engine which translates and replaces Apache Stanbol output with a schema.org-based ontology.</description>
+
+	<inceptionYear>2012</inceptionYear>
+
 	<url>http://wordlift.org</url>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Export-Package>
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.impl;version=${project.version},
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg;version=${project.version}
+						</Export-Package>
+						<Import-Package>
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg;version=${project.version},
+							io.insideout.wordlift.org.apache.stanbol.domain;version=${project.version},
+							io.insideout.wordlift.org.apache.stanbol.services;version=${project.version},
+							org.osgi.framework.*,
+							com.hp.hpl.jena.*,
+							org.apache.clerezza.rdf.core.*,
+							org.apache.clerezza.rdf.jena.*,
+							org.apache.stanbol.*,
+							org.slf4j
+						</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-scr-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wordlift-shared</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wordlift-tools</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.clerezza</groupId>
+			<artifactId>rdf.jena.facade</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.clerezza</groupId>
+			<artifactId>rdf.jena.parser</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.clerezza</groupId>
+			<artifactId>rdf.jena.storage</artifactId>
+			<version>0.5-incubating</version>
+		</dependency>
+
 		<!-- ##### T E S T - D E P E N D E N C I E S ##### -->
 		<dependency>
 			<groupId>com.hp.hpl.jena</groupId>
 			<artifactId>jena</artifactId>
-			<scope>test</scope>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.hp.hpl.jena</groupId>
 			<artifactId>arq</artifactId>
-			<scope>test</scope>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
