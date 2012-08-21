@@ -1,0 +1,10 @@
+[create-geocoordinates: (?s <http://www.w3.org/2003/01/geo/wgs84_pos#lat> ?lat), (?s <http://www.w3.org/2003/01/geo/wgs84_pos#long> ?long), noValue(?s rdf:type <http://schema.org/GeoCoordinates>)
+ makeTemp(?place), makeTemp(?geoCoordinates)
+ ->
+ remove(0, 1),
+ ( ?geoCoordinates rdf:type <http://schema.org/GeoCoordinates> ),
+ ( ?geoCoordinates <http://schema.org/latitude> ?lat ), ( ?geoCoordinates <http://schema.org/longitude> ?long ),
+ ( ?place rdf:type <http://schema.org/Place> ),
+ ( ?place <http://schema.org/geo> ?geoCoordinates ),
+ ( ?s <http://schema.org/location> ?place )
+]
