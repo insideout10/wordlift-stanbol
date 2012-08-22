@@ -1,0 +1,1 @@
+<strong>WordLift</strong> is a WordPress plugin that will add semantic intelligence to your site: by analizying your posts it highlights entities, tags your content, adds schema.org markup, creates intelligent relationships in your site by creating a new layer of navigation amongst your content.
