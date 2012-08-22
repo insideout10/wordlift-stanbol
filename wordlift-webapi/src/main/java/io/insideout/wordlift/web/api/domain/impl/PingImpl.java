@@ -1,5 +1,8 @@
 package io.insideout.wordlift.web.api.domain.impl;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class PingImpl {
 
     private String pong;
