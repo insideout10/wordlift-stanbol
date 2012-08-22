@@ -18,14 +18,13 @@ public class JobResourceImpl {
     @Context
     private Application application;
 
-    private JobService jobService;
-
     @POST
     public JobResponse createNewJob(JobRequest jobRequest) {
 
-        jobService = ((BundleAwareApplication) application).getService(JobService.class);
+        JobService jobService = ((BundleAwareApplication) application).getService(JobService.class);
 
         Job job = jobService.createJobFromJobRequest(jobRequest);
+        jobService.runJob(job);
 
         return new JobResponseImpl(job.getJobID(), 200, "A job has been created successfully.");
     }

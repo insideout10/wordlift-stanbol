@@ -5,12 +5,18 @@ import io.insideout.wordlift.web.api.domain.JobRequest;
 import io.insideout.wordlift.web.api.domain.impl.JobImpl;
 import io.insideout.wordlift.web.api.services.JobService;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.apache.stanbol.enhancer.servicesapi.ChainManager;
+import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
+import org.apache.stanbol.enhancer.servicesapi.EnhancementException;
+import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
+import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
 
 @Component(immediate = true)
 @Service
@@ -19,33 +25,34 @@ public class JobServiceImpl implements JobService {
     @Reference
     private ContentItemFactory contentItemFactory;
 
+    @Reference
+    private EnhancementJobManager enhancementJobManager;
+
+    @Reference
+    private ChainManager chainManager;
+
     @Override
     public Job createJobFromJobRequest(JobRequest jobRequest) {
 
-        return new JobImpl(UUID.randomUUID().toString());
+        return new JobImpl(UUID.randomUUID().toString(), jobRequest.getText());
     }
 
-    public void runJob() {
-        // ContentItem ci = ciFactory.createContentItem(new StringSource(content));
-        // if (!buildAjaxview) { // rewrite to a normal EnhancementRequest
-        // return enhanceFromData(ci, false, null, false, null, false, null, headers);
-        // } else { // enhance and build the AJAX response
-        // EnhancementException enhancementException;
-        // try {
-        // enhance(ci);
-        // enhancementException = null;
-        // } catch (EnhancementException e) {
-        // enhancementException = e;
-        // }
-        // ContentItemResource contentItemResource = new ContentItemResource(null, ci, uriInfo, "",
-        // serializer, servletContext, enhancementException);
-        // contentItemResource.setRdfSerializationFormat(format);
-        // Viewable ajaxView = new Viewable("/ajax/contentitem", contentItemResource);
-        // ResponseBuilder rb = Response.ok(ajaxView);
-        // rb.header(HttpHeaders.CONTENT_TYPE, TEXT_HTML + "; charset=UTF-8");
-        // addCORSOrigin(servletContext, rb, headers);
-        // return rb.build();
-        // }
-    }
+    public void runJob(Job job) {
+        ContentItem contentItem;
+        try {
+            contentItem = contentItemFactory.createContentItem(new StringSource(job.getText()));
+        } catch (IOException e) {
+            // TODO: fail job.
+            return;
+        }
+        if (null == enhancementJobManager) throw new RuntimeException(
+                "Cannot get a reference to the Enhancement Job Manager.");
 
+        try {
+            enhancementJobManager.enhanceContent(contentItem, chainManager.getDefault());
+        } catch (EnhancementException e) {
+            // TODO: fail job.
+            return;
+        }
+    }
 }

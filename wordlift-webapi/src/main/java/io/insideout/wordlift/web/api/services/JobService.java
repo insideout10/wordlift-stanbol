@@ -7,4 +7,6 @@ public interface JobService {
 
     public Job createJobFromJobRequest(JobRequest jobRequest);
 
+    public void runJob(Job job);
+
 }
