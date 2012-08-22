@@ -121,6 +121,7 @@
 		<module>freebase-engine</module>
 		<module>schemaorg-engine</module>
 		<module>wordlift-webfragment</module>
+		<module>wordlift-webapi</module>
 	</modules>
 
 </project>
