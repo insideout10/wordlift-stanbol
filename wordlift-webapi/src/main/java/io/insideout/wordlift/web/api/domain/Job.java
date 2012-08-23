@@ -4,9 +4,14 @@ public interface Job {
 
     public String getJobID();
 
-    public String getText();
+    public JobStatus getStatus();
+
+    public JobRequest getJobRequest();
 
     public void setJobID(String jobID);
 
-    public void setText(String text);
+    public void setStatus(JobStatus status);
+
+    public void setJobRequest(JobRequest jobRequest);
+
 }

@@ -7,6 +7,7 @@ public class JobRequestImpl implements JobRequest {
     private String consumerKey;
     private String text;
     private String callbackURL;
+    private String mimeType;
 
     @Override
     public String getConsumerKey() {
@@ -36,6 +37,16 @@ public class JobRequestImpl implements JobRequest {
     @Override
     public void setCallbackURL(String callbackURL) {
         this.callbackURL = callbackURL;
+    }
+
+    @Override
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    @Override
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
 }

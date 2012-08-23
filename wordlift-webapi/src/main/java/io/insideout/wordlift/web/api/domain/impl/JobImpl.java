@@ -1,18 +1,16 @@
 package io.insideout.wordlift.web.api.domain.impl;
 
 import io.insideout.wordlift.web.api.domain.Job;
+import io.insideout.wordlift.web.api.domain.JobRequest;
+import io.insideout.wordlift.web.api.domain.JobStatus;
 
 public class JobImpl implements Job {
 
     private String jobID;
-    private String text;
+    private JobStatus status;
+    private JobRequest jobRequest;
 
     public JobImpl() {}
-
-    public JobImpl(String jobID, String text) {
-        this.jobID = jobID;
-        this.text = text;
-    }
 
     @Override
     public String getJobID() {
@@ -25,13 +23,23 @@ public class JobImpl implements Job {
     }
 
     @Override
-    public String getText() {
-        return text;
+    public JobStatus getStatus() {
+        return status;
     }
 
     @Override
-    public void setText(String text) {
-        this.text = text;
+    public void setStatus(JobStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public JobRequest getJobRequest() {
+        return jobRequest;
+    }
+
+    @Override
+    public void setJobRequest(JobRequest jobRequest) {
+        this.jobRequest = jobRequest;
     }
 
 }

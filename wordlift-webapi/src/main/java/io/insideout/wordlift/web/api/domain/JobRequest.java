@@ -15,10 +15,14 @@ public interface JobRequest {
 
     public String getCallbackURL();
 
+    public String getMimeType();
+
     public void setConsumerKey(String consumerKey);
 
     public void setText(String text);
 
     public void setCallbackURL(String callbackURL);
+
+    public void setMimeType(String mimeType);
 
 }
