@@ -26,6 +26,6 @@
 
     Il suo compagno di squadra Nicky Hayden, di fronte al suo pubblico, spera di fare bene: \"Laguna è stata divertente, ma Indy è proprio il mio GP di casa, proprio di fronte al confine di stato col Kentucky. Speriamo di poter fare un buon risultato. Abbiamo faticato più a Laguna di quanto mi aspettassi, ma Indy è molto più veloce, con più possibilità di aprire il gas. Dovrebbe essere bello guidare lì e sarà divertente per i fan americani arrivare davvero a vederci in azione. La scorsa stagione, l'usura degli pneumatici è stato un problema, ma si spera che la pista sarà un po' meglio quest'anno. Spero di essere competitivo a partire dal venerdì, e sarò sicuramente deluso se non oterrò il miglior risultato della stagione fino ad ora\".
     ",
-    "callbackURL": "http://localhost/example",
+    "callbackURL": "http://localizeme.dyndns.org/wordlift/wp-admin/admin-ajax.php?action=wordlift.jobCallback",
     "mimeType":"application/rdf+xml"
 }

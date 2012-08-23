@@ -20,7 +20,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
@@ -130,6 +129,7 @@ public class JobExecutorThreadImpl implements Runnable {
         try {
             stringEntity = new StringEntity(outputStream.toString(charset), ContentType.create(mimeType,
                 charset));
+            httpPost.setEntity(stringEntity);
             httpResponse = httpClient.execute(httpPost);
         } catch (UnsupportedCharsetException e) {
             jobService.failJob(job, e);
