@@ -208,7 +208,6 @@ public class FreebaseEntityRecognitionEngine extends
 
                 // add the URI references to the Text Annotations.
                 graph.add(new TripleImpl(entityAnnotation, DC_RELATION, textAnnotation.getURI()));
-
                 graph.add(new TripleImpl(entityAnnotation, ENHANCER_ENTITY_REFERENCE, entityURI));
                 graph.add(new TripleImpl(entityAnnotation, ENHANCER_ENTITY_LABEL, label));
                 graph.add(new TripleImpl(entityAnnotation, ENHANCER_CONFIDENCE, LiteralFactory.getInstance()

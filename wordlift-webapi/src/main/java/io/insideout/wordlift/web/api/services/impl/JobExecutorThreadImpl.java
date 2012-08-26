@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
@@ -105,6 +106,14 @@ public class JobExecutorThreadImpl implements Runnable {
 
         HttpClient httpClient = new DefaultHttpClient();
 
+        String contentItemURI = contentItem.getUri().toString();
+        try {
+            contentItemURI = URLEncoder.encode(contentItemURI, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.warn("An exception [{}] occured [ contentItemURI :: {} ]:\n{}",
+                new Object[] {e.getClass(), contentItemURI, e.getMessage()});
+        }
+
         URIBuilder builder;
         URI uri;
 
@@ -112,7 +121,7 @@ public class JobExecutorThreadImpl implements Runnable {
             String url = job.getJobRequest().getCallbackURL();
 
             // add the jobID to the URL.
-            if (0 < url.indexOf("?")) url += "&jobID=" + job.getJobID();
+            if (0 < url.indexOf("?")) url += "&jobID=" + job.getJobID() + "&contentItemURI=" + contentItemURI;
             else url += "?jobID=" + job.getJobID();
 
             builder = new URIBuilder(url);
