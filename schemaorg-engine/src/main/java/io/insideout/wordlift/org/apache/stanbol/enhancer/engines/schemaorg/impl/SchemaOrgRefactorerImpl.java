@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.ConfigurationPolicy;
@@ -70,6 +71,11 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
     private Reasoner rulesReasoner;
     private Reasoner ontologyReasoner;
 
+    private final static UriRef TEXT_ANNOTATION_URI = new UriRef(
+            "http://fise.iks-project.eu/ontology/TextAnnotation");
+
+    private final boolean copyTextAnnotations = true;
+
     private final static Map<String,String> prefixes;
 
     static {
@@ -86,6 +92,12 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
     // activate(properties);
     // }
 
+    /**
+     * Activates the SchemaOrgRefactorer instance.
+     * 
+     * @param properties
+     *            A map of properties for the refactorer.
+     */
     @Activate
     private void activate(Map<String,Object> properties) {
         //
@@ -120,20 +132,61 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
     }
 
     private Model processModel(Model data, String languageTwoLetterCode) {
+        Model destinationModel = ModelFactory.createDefaultModel();
+        destinationModel.setNsPrefixes(prefixes);
+
         InfModel rulesModel = ModelFactory.createInfModel(rulesReasoner, data);
 
         Model sourceModel = ModelFactory.createInfModel(ontologyReasoner, rulesModel);
 
-        Model destinationModel = ModelFactory.createDefaultModel();
-        destinationModel.setNsPrefixes(prefixes);
-
+        // process each resource type configured in the refactore (e.g. http://schema.org/Person,
+        // http://schema.org/Organization, ...).
         for (String typeURI : typeURIs)
             addResourceOfType(sourceModel, typeURI, destinationModel, languageTwoLetterCode);
+
+        // copy all the text annotations.
+        if (copyTextAnnotations) copyTextAnnotations(data, destinationModel);
 
         return destinationModel;
 
     }
 
+    /**
+     * Copy all the text annotations from the source model to the destination model.
+     * 
+     * @param sourceModel
+     *            The source model.
+     * @param destinationModel
+     *            The destination model.
+     */
+    private void copyTextAnnotations(Model sourceModel, Model destinationModel) {
+        Resource typeResource = sourceModel
+                .createResource("http://fise.iks-project.eu/ontology/TextAnnotation");
+        ResIterator resourcesIterator = sourceModel.listSubjectsWithProperty(RDF.type, typeResource);
+
+        while (resourcesIterator.hasNext()) {
+            Resource resource = resourcesIterator.nextResource();
+            destinationModel.add(resource.listProperties());
+            // StmtIterator statementsIterator = sourceModel.listStatements(resource, null, (RDFNode) null);
+            // destinationModel.add(statementsIterator);
+        }
+
+        resourcesIterator.close();
+    }
+
+    /**
+     * Get all the resources of the specified type from the sourceModel and copy them to the destinationModel,
+     * keeping only the specified language (where applicable).
+     * 
+     * @param sourceModel
+     *            The source model, containing the triples to be parsed.
+     * @param type
+     *            The entities' type to copy.
+     * @param destinationModel
+     *            The destination model.
+     * @param languageTwoLetterCode
+     *            The two-letters language code to copy (skip the others).
+     */
     private void addResourceOfType(Model sourceModel,
                                    String type,
                                    Model destinationModel,
@@ -146,8 +199,9 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
             Resource resource = resourcesIterator.nextResource();
             destinationModel.add(resource, RDF.type, typeResource);
             addProperties(sourceModel, resource, languageTwoLetterCode, destinationModel);
-
         }
+
+        resourcesIterator.close();
     }
 
     private void addProperties(Model sourceModel,
@@ -155,6 +209,7 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
                                final String languageTwoLetterCode,
                                Model destinationModel) {
 
+        // select only statements that are http://schema.org/ or the entityhub query score.
         StmtIterator statementsIterator = sourceModel.listStatements(new SimpleSelector(subject, null,
                 (RDFNode) null) {
             public boolean selects(Statement s) {

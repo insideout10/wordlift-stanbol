@@ -9,10 +9,18 @@ import org.apache.clerezza.rdf.core.UriRef;
 
 public class TextAnnotationImpl implements TextAnnotation {
 
+    private UriRef uriReference;
     private String languageTwoLetterCode;
     private String text;
     private double confidence;
-    private Set<UriRef> uriReference = new HashSet<UriRef>();
+    private Set<UriRef> uriReferences = new HashSet<UriRef>();
+
+    private long start;
+    private long end;
+    private String selectionPrefix;
+    private String selectionHead;
+    private String selectionTail;
+    private String selectionSuffix;
 
     public TextAnnotationImpl() {}
 
@@ -20,7 +28,7 @@ public class TextAnnotationImpl implements TextAnnotation {
                               String text,
                               String languageTwoLetterCode,
                               Double confidence) {
-        this.uriReference.add(uriReference);
+        this.uriReferences.add(uriReference);
         this.text = text;
         this.languageTwoLetterCode = languageTwoLetterCode;
         this.confidence = confidence;
@@ -35,11 +43,11 @@ public class TextAnnotationImpl implements TextAnnotation {
     }
 
     public Set<UriRef> getUriReference() {
-        return uriReference;
+        return uriReferences;
     }
 
-    public void setUriReference(Set<UriRef> uriReference) {
-        this.uriReference = uriReference;
+    public void setUriReference(Set<UriRef> uriReferences) {
+        this.uriReferences = uriReferences;
     }
 
     public String getLanguageTwoLetterCode() {
@@ -65,7 +73,77 @@ public class TextAnnotationImpl implements TextAnnotation {
     }
 
     public void addUriReference(UriRef textAnnotationURI) {
-        uriReference.add(textAnnotationURI);
+        uriReferences.add(textAnnotationURI);
+    }
+
+    @Override
+    public long getStart() {
+        return start;
+    }
+
+    @Override
+    public long getEnd() {
+        return end;
+    }
+
+    @Override
+    public String getSelectionPrefix() {
+        return selectionPrefix;
+    }
+
+    @Override
+    public String getSelectionHead() {
+        return selectionHead;
+    }
+
+    @Override
+    public String getSelectionTail() {
+        return selectionTail;
+    }
+
+    @Override
+    public String getSelectionSuffix() {
+        return selectionSuffix;
+    }
+
+    @Override
+    public void setSelectionPrefix(String selectionPrefix) {
+        this.selectionPrefix = selectionPrefix;
+    }
+
+    @Override
+    public void setSelectionHead(String selectionHead) {
+        this.selectionHead = selectionHead;
+    }
+
+    @Override
+    public void setSelectionTail(String selectionTail) {
+        this.selectionTail = selectionTail;
+    }
+
+    @Override
+    public void setSelectionSuffix(String selectionSuffix) {
+        this.selectionSuffix = selectionSuffix;
+    }
+
+    @Override
+    public void setStart(long start) {
+        this.start = start;
+    }
+
+    @Override
+    public void setEnd(long end) {
+        this.end = end;
+    }
+
+    @Override
+    public UriRef getURI() {
+        return uriReference;
+    }
+
+    @Override
+    public void setURI(UriRef uriReference) {
+        this.uriReference = uriReference;
     }
 
 }

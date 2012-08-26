@@ -2,7 +2,9 @@ package io.insideout.wordlift.org.apache.stanbol.services.impl;
 
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.DC_LANGUAGE;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_CONFIDENCE;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_END;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_SELECTED_TEXT;
+import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.ENHANCER_START;
 import static org.apache.stanbol.enhancer.servicesapi.rdf.Properties.RDF_TYPE;
 import io.insideout.wordlift.org.apache.stanbol.domain.TextAnnotation;
 import io.insideout.wordlift.org.apache.stanbol.domain.impl.TextAnnotationImpl;
@@ -62,8 +64,13 @@ public class TextAnnotationServiceImpl implements TextAnnotationService {
         Iterator<Triple> iterator = graph.filter(null, RDF_TYPE, TechnicalClasses.ENHANCER_TEXTANNOTATION);
 
         while (iterator.hasNext()) {
+
+            // get the unique TextAnnotation URI.
             UriRef textAnnotationURI = (UriRef) iterator.next().getSubject();
+
+            // get the graph-context for this TextAnnotation.
             Graph textAnnotationContext = new GraphNode(textAnnotationURI, graph).getNodeContext();
+
             TextAnnotation textAnnotation = createTextAnnotationFromGraphWithURI(textAnnotationContext,
                 textAnnotationURI);
 
@@ -98,7 +105,9 @@ public class TextAnnotationServiceImpl implements TextAnnotationService {
         textAnnotation.setText(getUniqueValue(graph, uriReference, ENHANCER_SELECTED_TEXT, ""));
         textAnnotation.setConfidence(getUniqueValue(graph, uriReference, ENHANCER_CONFIDENCE, (Double) 0.0));
         textAnnotation.setLanguageTwoLetterCode(getUniqueValue(graph, uriReference, DC_LANGUAGE, ""));
-        textAnnotation.addUriReference(uriReference);
+        textAnnotation.setStart(getUniqueValue(graph, uriReference, ENHANCER_START, Long.valueOf(-1L)));
+        textAnnotation.setEnd(getUniqueValue(graph, uriReference, ENHANCER_END, Long.valueOf(-1L)));
+        textAnnotation.setURI(uriReference);
 
         return textAnnotation;
     }
@@ -126,6 +135,16 @@ public class TextAnnotationServiceImpl implements TextAnnotationService {
             // ##### S T R I N G #####
             if (String.class.equals(defaultValue.getClass())) {
                 return (T) literal.getLexicalForm();
+            }
+
+            // ##### L O N G #####
+            if (Long.class.equals(defaultValue.getClass())) {
+                try {
+                    return (T) Long.valueOf(literal.getLexicalForm());
+                } catch (NumberFormatException e) {
+                    logger.error("The value of [{}] on subject [{}] is invalid:\n{}",
+                        new Object[] {predicate, subject, e.getMessage()});
+                }
             }
 
             logger.error("The type [{}] is unknown, returning the default value.", defaultValue.getClass());

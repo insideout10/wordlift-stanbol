@@ -100,8 +100,8 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
             logger.trace("Found [{}] entities via the Site for [{}].", new Object[] {entities.size(),
                                                                                      sameAsReference});
 
-            entityRecognitionEngine.writeEntities(contentItem, entities, language,
-                textAnnotation.getUriReference(), result.getScore());
+            entityRecognitionEngine.writeEntities(contentItem, entities, language, textAnnotation,
+                result.getScore());
         }
 
     }

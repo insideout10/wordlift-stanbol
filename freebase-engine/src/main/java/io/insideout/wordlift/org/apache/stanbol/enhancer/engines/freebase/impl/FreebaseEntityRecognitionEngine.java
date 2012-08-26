@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -150,8 +149,8 @@ public class FreebaseEntityRecognitionEngine extends
     }
 
     /**
-     * Computes the enhancements for the provided ContentItem and returns the results in the ContentItem's graph.
-     * This method is asynchrounous and usually called by Stanbol components.
+     * Computes the enhancements for the provided ContentItem and returns the results in the ContentItem's
+     * graph. This method is asynchrounous and usually called by Stanbol components.
      */
     @Override
     public void computeEnhancements(ContentItem ci) throws EngineException {
@@ -181,7 +180,7 @@ public class FreebaseEntityRecognitionEngine extends
     public void writeEntities(ContentItem contentItem,
                               QueryResultList<Entity> entities,
                               String language,
-                              Set<UriRef> textAnnotationURIs,
+                              TextAnnotation textAnnotation,
                               double score) {
 
         // now write the results (requires write lock)
@@ -208,8 +207,7 @@ public class FreebaseEntityRecognitionEngine extends
                 UriRef entityURI = new UriRef(representation.getId());
 
                 // add the URI references to the Text Annotations.
-                for (UriRef textAnnotationURI : textAnnotationURIs)
-                    graph.add(new TripleImpl(entityAnnotation, DC_RELATION, textAnnotationURI));
+                graph.add(new TripleImpl(entityAnnotation, DC_RELATION, textAnnotation.getURI()));
 
                 graph.add(new TripleImpl(entityAnnotation, ENHANCER_ENTITY_REFERENCE, entityURI));
                 graph.add(new TripleImpl(entityAnnotation, ENHANCER_ENTITY_LABEL, label));
