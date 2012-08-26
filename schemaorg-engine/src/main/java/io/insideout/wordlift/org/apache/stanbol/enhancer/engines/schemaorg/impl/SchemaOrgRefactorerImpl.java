@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.clerezza.rdf.core.UriRef;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.ConfigurationPolicy;
@@ -71,8 +70,8 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
     private Reasoner rulesReasoner;
     private Reasoner ontologyReasoner;
 
-    private final static UriRef TEXT_ANNOTATION_URI = new UriRef(
-            "http://fise.iks-project.eu/ontology/TextAnnotation");
+    private final static String TEXT_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/TextAnnotation";
+    private final static String ENTITY_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/EntityAnnotation";
 
     private final boolean copyTextAnnotations = true;
 
@@ -145,7 +144,10 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
             addResourceOfType(sourceModel, typeURI, destinationModel, languageTwoLetterCode);
 
         // copy all the text annotations.
-        if (copyTextAnnotations) copyTextAnnotations(data, destinationModel);
+        copySubjectsOfType(data, destinationModel, TEXT_ANNOTATION_URI_STRING);
+
+        // copy all the entity annotations.
+        copySubjectsOfType(data, destinationModel, ENTITY_ANNOTATION_URI_STRING);
 
         return destinationModel;
 
@@ -159,16 +161,13 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
      * @param destinationModel
      *            The destination model.
      */
-    private void copyTextAnnotations(Model sourceModel, Model destinationModel) {
-        Resource typeResource = sourceModel
-                .createResource("http://fise.iks-project.eu/ontology/TextAnnotation");
+    private void copySubjectsOfType(Model sourceModel, Model destinationModel, String typeURI) {
+        Resource typeResource = sourceModel.createResource(typeURI);
         ResIterator resourcesIterator = sourceModel.listSubjectsWithProperty(RDF.type, typeResource);
 
         while (resourcesIterator.hasNext()) {
             Resource resource = resourcesIterator.nextResource();
             destinationModel.add(resource.listProperties());
-            // StmtIterator statementsIterator = sourceModel.listStatements(resource, null, (RDFNode) null);
-            // destinationModel.add(statementsIterator);
         }
 
         resourcesIterator.close();
