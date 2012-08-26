@@ -149,6 +149,10 @@ public class FreebaseEntityRecognitionEngine extends
         return ENHANCE_ASYNC;
     }
 
+    /**
+     * Computes the enhancements for the provided ContentItem and returns the results in the ContentItem's graph.
+     * This method is asynchrounous and usually called by Stanbol components.
+     */
     @Override
     public void computeEnhancements(ContentItem ci) throws EngineException {
 

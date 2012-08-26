@@ -53,16 +53,41 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
     @Property(value = {"as", "ca", "cy", "en", "es", "gl", "it", "pt", "ru"})
     private final static String FREELING_CONFIGURATION_LANGUAGES = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.languages";
 
+    // the Freeling library share path.
     private String freelingSharePath;
+
+    // the Freeling library configuration path.
     private String configurationPath;
+
+    // the Freeling configuration files suffix (e.g. .cfg).
     private String configurationFilenameSuffix;
+
+    // an array of supported languages (2-letters code).
     private String[] freelingLanguages;
+
+    // the Freeling locale for library initialization.
     private String freelingLocale = "default";
 
+    // the short-tag of words that will be selected from the texts.
+    private final String shortTag = "NP";
+
+    // a Map of Freeling Analisys configurations, the key being a 2-letters language code.
     private Map<String,FreelingAnalysis> freelingModules = new HashMap<String,FreelingAnalysis>();
 
+    /**
+     * Empty constructor for OSGi support.
+     */
     public PartOfSpeechTaggingImpl() {}
 
+    /**
+     * Creates a new instance of the PartOfSpeechTagging implementation, using the provided parameters. Useful
+     * for tests.
+     * 
+     * @param sharePath
+     * @param configurationPath
+     * @param configuratioFilenameSuffix
+     * @param languages
+     */
     public PartOfSpeechTaggingImpl(String sharePath,
                                    String configurationPath,
                                    String configuratioFilenameSuffix,
@@ -77,8 +102,15 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
         activate(properties);
     }
 
+    /**
+     * Activate method called by the OSGi container.
+     * 
+     * @param properties
+     *            A map of configuration properties.
+     */
     @Activate
     private void activate(Map<String,Object> properties) {
+
         freelingSharePath = (String) properties.get(FREELING_SHARE_PATH);
         configurationPath = (String) properties.get(FREELING_CONFIGURATION_PATH);
         configurationFilenameSuffix = (String) properties.get(FREELING_CONFIGURATION_FILE_SUFFIX);
@@ -86,12 +118,21 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 
         logger.trace("Setting locale [{}].", freelingLocale);
 
+        // initialize the locale (usually 'default').
         Util.initLocale(freelingLocale);
 
+        // load the configuration for each of the configured languages.
         for (String language : freelingLanguages)
             loadConfigurationForLanguage(language);
     }
 
+    /**
+     * Loads the configuration for the provided language by locating the configuration file and parsing its
+     * contents.
+     * 
+     * @param language
+     *            A two-letters language code.
+     */
     private void loadConfigurationForLanguage(String language) {
         String propertiesFilePath = String.format("%s/%s%s", configurationPath, language,
             configurationFilenameSuffix);
@@ -195,6 +236,11 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 
     }
 
+    /**
+     * A class that maps Freeling configurations.
+     * 
+     * @author David Riccitelli
+     */
     private class FreelingAnalysis {
         private Maco maco;
         private Tokenizer tokenizer;
@@ -289,10 +335,22 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 
     }
 
+    /**
+     * Get a set of nouns by analysing the text of the specified language.
+     */
     public Set<Noun> getNouns(String language, String text) {
         return getNouns(freelingModules.get(language), text);
     }
 
+    /**
+     * Get a set of nouns by analyzing the text with the provided Freeling configuration.
+     * 
+     * @param analysis
+     *            The Freeling configuration.
+     * @param text
+     *            The text to analyse.
+     * @return A set of nouns.
+     */
     private Set<Noun> getNouns(FreelingAnalysis analysis, String text) {
 
         // Extract the tokens from the line of text.
@@ -334,7 +392,7 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
             for (int j = 0; j < sentence.size(); j++) {
                 Word word = sentence.get(j);
 
-                if (!"NP".equals(word.getShortTag()) || !word.foundInDict()) continue;
+                if (!shortTag.equals(word.getShortTag()) || !word.foundInDict()) continue;
 
                 Analysis analysis = word.getAnalysis().get(0);
 
@@ -357,6 +415,13 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
         return nouns;
     }
 
+    /**
+     * Check if the specified language is supported.
+     * 
+     * @param languageTwoLetterCode
+     *            The language two-letters code.
+     * @return True if the language is supported, otherwise false.
+     */
     public boolean isLanguageSupported(String languageTwoLetterCode) {
         return Arrays.asList(freelingLanguages).contains(languageTwoLetterCode);
     }
