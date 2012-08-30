@@ -25,6 +25,7 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
     private String defaultLanguage;
     private String freebaseURI;
     private FreebaseEntityRecognitionEngine entityRecognitionEngine;
+    private double minimumScore;
 
     public FreebaseEntityRecognitionRunnable(TextAnnotation textAnnotation,
                                              Site site,
@@ -32,7 +33,8 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
                                              ContentItem contentItem,
                                              String defaultLanguage,
                                              String freebaseURI,
-                                             FreebaseEntityRecognitionEngine entityRecognitionEngine) {
+                                             FreebaseEntityRecognitionEngine entityRecognitionEngine,
+                                             double minimumScore) {
         this.textAnnotation = textAnnotation;
         this.site = site;
         this.freebaseEntityRecognition = freebaseEntityRecognition;
@@ -40,6 +42,7 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
         this.defaultLanguage = defaultLanguage;
         this.freebaseURI = freebaseURI;
         this.entityRecognitionEngine = entityRecognitionEngine;
+        this.minimumScore = minimumScore;
     }
 
     @Override
@@ -58,6 +61,8 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 
         // continue to the next search if there are no results.
         if (null == results) return;
+
+        double maxScore = getMaxScore(results);
 
         for (FreebaseResult result : results) {
             String sameAsReference = freebaseURI + result.getMid().replace("/m/", "/m.");
@@ -99,11 +104,20 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 
             logger.trace("Found [{}] entities via the Site for [{}].", new Object[] {entities.size(),
                                                                                      sameAsReference});
+            double score = result.getScore() / maxScore;
 
-            entityRecognitionEngine.writeEntities(contentItem, entities, language, textAnnotation,
-                result.getScore());
+            if (score < minimumScore) continue;
+            
+            entityRecognitionEngine.writeEntities(contentItem, entities, language, textAnnotation, score);
         }
 
     }
 
+    private double getMaxScore(Collection<FreebaseResult> results) {
+        double maxScore = 0.0;
+        for (FreebaseResult result : results)
+            if (maxScore < result.getScore()) maxScore = result.getScore();
+
+        return maxScore;
+    }
 }

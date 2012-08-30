@@ -74,11 +74,15 @@ public class FreebaseEntityRecognitionEngine extends
     @Property(value = "http://rdf.freebase.com/ns")
     private final static String FREEBASE_RDF_URI = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freebase.rdf.uri";
 
+    @Property(doubleValue = 0.25)
+    private final static String MINIMUM_SCORE = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freebase.score.minimum";
+
     public static final Integer defaultOrder = ORDERING_EXTRACTION_ENHANCEMENT;
 
     private String freebaseURI;
     private int maxConcurrentSearchThreads;
     private long searchTimeoutSeconds;
+    private double minimumScore;
 
     // holds the site bound to this engine. it gets initialized in the Activate method, using the siteName
     // variable defined above.
@@ -120,6 +124,7 @@ public class FreebaseEntityRecognitionEngine extends
         maxConcurrentSearchThreads = (Integer) properties.get(MAX_CONCURRENT_SEARCH_THREADS);
         searchTimeoutSeconds = (Long) properties.get(SEARCH_TIMEOUT_SECONDS);
         freebaseURI = (String) properties.get(FREEBASE_RDF_URI);
+        minimumScore = (Double) properties.get(MINIMUM_SCORE);
 
         site = siteManager.getSite(siteName);
 
@@ -163,7 +168,7 @@ public class FreebaseEntityRecognitionEngine extends
         // process each annotation.
         for (TextAnnotation textAnnotation : textAnnotations) {
             Runnable entityRecognitionRunnable = new FreebaseEntityRecognitionRunnable(textAnnotation, site,
-                    freebaseEntityRecognition, ci, defaultLanguage, freebaseURI, this);
+                    freebaseEntityRecognition, ci, defaultLanguage, freebaseURI, this, minimumScore);
             executor.execute(entityRecognitionRunnable);
         }
 
