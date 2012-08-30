@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>parent</artifactId>
+		<groupId>io.insideout.wordlift</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<packaging>bundle</packaging>
+	<artifactId>confidence-normalization-and-filterting</artifactId>
+	<name>InsideOut10 for Apache Stanbol : Confidence Normalization and Filtering engine</name>
+	<url>http://wordlift.it</url>
+
+	<dependencies>
+		<!-- ##### W O R D L I F T ##### -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wordlift-shared</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>wordlift-tools</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Export-Package>
+							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.confidence.*;version=${project.version}
+						</Export-Package>
+						<Import-Package>
+							io.insideout.wordlift.org.apache.stanbol.services;version=${project.version},
+							io.insideout.wordlift.org.apache.stanbol.domain;version=${project.version},
+							org.apache.stanbol.*,
+							org.apache.clerezza.*,
+							org.apache.commons.*,
+							org.osgi.*,
+							javax.*,
+							org.ietf.jgss,
+							org.slf4j
+						</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-scr-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
