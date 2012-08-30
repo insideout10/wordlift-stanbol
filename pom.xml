@@ -122,6 +122,7 @@
 		<module>wordlift-webfragment</module>
 		<module>wordlift-webapi</module>
     <module>textannotations-futuremodel</module>
+    <module>confidence-normalization-and-filterting</module>
   </modules>
 
 </project>
