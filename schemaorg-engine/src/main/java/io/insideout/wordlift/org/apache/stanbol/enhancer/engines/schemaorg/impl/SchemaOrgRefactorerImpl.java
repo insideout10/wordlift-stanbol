@@ -50,9 +50,6 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
                        "http://schema.org/CreativeWork", "http://schema.org/MedicalEntity"})
     private final static String TYPE_URIS = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.type.uri";
 
-    private final static String DEFAULT_CUSTOM_MAPPINGS_PATH = "custom-mappings.rdf";
-    private final static String DEFAULT_CUSTOM_RULES_PATH = "custom-rules.rules";
-    private final static String DEFAULT_DBPEDIA_MAPPINGS_PATH = "dbpedia-mappings.rdf";
     private final static String[] DEFAULT_TYPE_URIS = {"http://schema.org/Place",
                                                        "http://schema.org/GeoCoordinates",
                                                        "http://schema.org/Product",
@@ -72,8 +69,6 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
 
     private final static String TEXT_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/TextAnnotation";
     private final static String ENTITY_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/EntityAnnotation";
-
-    private final boolean copyTextAnnotations = true;
 
     private final static Map<String,String> prefixes;
 
@@ -232,6 +227,5 @@ public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
 
     }
 
-    @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.getLogger(getClass());
 }

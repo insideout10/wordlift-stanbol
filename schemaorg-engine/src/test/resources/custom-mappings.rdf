@@ -8,6 +8,10 @@
   <owl:Class rdf:about="http://schema.org/GeoCoordinates">
     <rdfs:subClassOf rdf:resource="http://schema.org/Thing"/>
   </owl:Class>
+  
+  <owl:Class rdf:about="http://umbel.org/umbel/rc/Organization">
+    <owl:equivalentClass rdf:resource="http://schema.org/Organization"/>
+  </owl:Class>
 
   <!--
   <owl:DatatypeProperty rdf:about="http://schema.org/name">
