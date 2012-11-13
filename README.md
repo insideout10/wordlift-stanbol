@@ -266,8 +266,7 @@ io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.type.uri=["h
 
 #### TextAnnotation NewModel engine
 
-Configure "TextAnnotation Model Engine"
-give a name to the engine instance
+Configure "TextAnnotation Model Engine", by giving a name to its instance, e.g. "textannotations-newmodel", then start it.
 
 #### Freeling PoS Tagging engine
 
