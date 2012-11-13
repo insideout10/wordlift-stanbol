@@ -72,46 +72,58 @@ Improve the unit tests.
           - stanbol.conf
 
 
-### Installation
+### Requirements
 
-#### Requirements
+#### Maven 3
 
-##### Maven 3
-
+```sh
 export MAVEN_OPTS="-Xmx512M -XX:MaxPermSize=128M"
+```
 
 In case of errors during the compilation try to raise the values, e.g.
+```sh
 export MAVEN_OPTS="-Xmx512M -XX:MaxPermSize=128M"
+```
 
-#### Install Stanbol
+### Install Stanbol
 
 For reference: http://stanbol.apache.org/docs/trunk/tutorial.html
 
 Checkout Stanbol:
+```sh
 svn co http://svn.apache.org/repos/asf/stanbol/trunk stanbol
+```
 
+```sh
 mvn clean install
+```
+
 -- or --
+
+```sh
 mvn -DskipTests clean install
+```
 
-#### Run Stanbol
+### Run Stanbol
 
+```sh
 java -Xmx1g -jar stable/target/org.apache.stanbol.launchers.stable-{snapshot-version}-SNAPSHOT.jar
+```
 
 Check that it works at
 http://localhost:8080
 
 
-### Install Freeling
+## Install Freeling
 
 Reference:
 http://nlp.lsi.upc.edu/freeling/index.php?option=com_content&task=view&id=25&Itemid=62
 
-#### Install on Ubuntu 12.04
+### Install on Ubuntu 12.04
 
 Follow instructions here http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf
 
-#### Install on Mac OS X
+### Install on Mac OS X
 
 use Brew
 
@@ -146,14 +158,13 @@ java -> $(JAVADIR)/bin/java
 jar -> $(JAVADIR)/bin/jar
 
 
-ln -s /Users/david/Developer/freeling/APIs/java/libfreeling_javaAPI.so /usr/local/lib/libfreeling_javaAPI.so
+#### Load the Java APIs in the Maven repository
 
-##### Load the Java APIs in the Maven repository
-
+```sh
 mvn install:install-file  -Dfile=freeling.jar -DgroupId=edu.upc.freeling -DartifactId=edu.upc.freeling -Dversion=3.0 -Dpackaging=jar
+```
 
-
-### Configuration
+## Configuration
 
 Configure "InsideOut10 for Stanbol: Freeling Language Identifier engine"
 provide path to languageIdentifierConfiguration.cfg
@@ -179,6 +190,8 @@ Configure "PartOfSpeechTagging Engine"
 ApiServiceImpl
 start manually
 
-### Execution
+## Execution
 
+```sh
 java -Djava.library.path=/usr/local/lib -Xmx1g -jar ../../stanbol-HEAD/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
+```
