@@ -126,7 +126,12 @@ Create a *run* folder for Apache Stanbol:
 Then launch Apache Stanbol from the *run* folder; replace {version} with the current version of Apache Stanbol:
 ```sh
 cd /opt/stanbol/var/run/1
-java -Xmx1g -jar ../../../bin/stable/target/org.apache.stanbol.launchers.stable-{version}-SNAPSHOT.jar
+java -Xmx1g -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-{version}.jar
+```
+
+For example, to run *0.10.0-SNAPSHOT*:
+```sh
+java -Xmx1g -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
 ```
 
 Check that Apache Stanbol is working by opening the following URL with your browser (replace *localhost* with the server name):
@@ -142,6 +147,15 @@ http://nlp.lsi.upc.edu/freeling/index.php?option=com_content&task=view&id=25&Ite
 #### Install on Ubuntu 12.04
 
 Follow instructions here http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf
+
+##### Install data dictionaries
+
+In a terminal window, move to the *data* subfolder of the Freeling sources and type:
+```sh
+make install
+```
+
+The dictionaries will be created by default in `/usr/local/share/freeling`.
 
 #### Install on Mac OS X
 
@@ -184,11 +198,46 @@ jar -> $(JAVADIR)/bin/jar
 mvn install:install-file  -Dfile=freeling.jar -DgroupId=edu.upc.freeling -DartifactId=edu.upc.freeling -Dversion=3.0 -Dpackaging=jar
 ```
 
+### Install Apache Stanbol Engines (Freebase, Freeling, Schema.org, WordLift)
+
+Checkout sources:
+```sh
+git clone https://github.com/insideout10/wordlift-stanbol.git
+```
+
+Compile and install; replace {server} with your server name:
+```sh
+mvn clean install -PinstallBundle -Dsling.url=http://{server}/system/console
+```
+
 ## Configuration
+
+### Freeling Configuration
+
+Create the following folders:
+```sh
+ /opt/freeling
+  - etc
+```
+
+In the *etc* folder, create a *symbolic link* to `/usr/local/share/freeling` (or where the share/freeling folder is located, e.g. /usr/local/Cellar/freeling/3.0/share/freeling on a Mac OS X install using *brew*).
+
+### Stanbol Configuration
+
+Most of the configuration can be dones on
+http://{server}/system/console/components
+
+#### Freeling Language Identifier engine
 
 Configure "InsideOut10 for Stanbol: Freeling Language Identifier engine"
 provide path to languageIdentifierConfiguration.cfg
 
+stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/freeling/impl/LanguageIdentifierImpl.config
+
+service.bundleLocation="inputstream:freeling-engine-1.0-SNAPSHOT.jar"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.locale="default"service.pid="
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.LanguageIdentifierImpl"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.path="/opt/freeling/etc/languageIdentifierConfiguration.cfg"
 
 Configure "InsideOut10 for Stanbol: Schema.org refactorer engine"
 give a name to the engine instance
@@ -202,8 +251,21 @@ provide paths to
 Configure "TextAnnotation Model Engine"
 give a name to the engine instance
 
-Configure "InsideOut10 for Stanbol: Freeling PoS Tagging Engine"
-give a name to the engine instance
+#### Freeling PoS Tagging engine
+
+stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/freeling/impl/PartOfSpeechTaggingImpl.config
+
+service.bundleLocation="inputstream:freeling-engine-1.0-SNAPSHOT.jar"
+service.pid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.PartOfSpeechTaggingImpl"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.languages=["en","es","it","pt","ru"]
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.file.suffix=".cfg"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.share.path="/opt/freeling/etc/freeling"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.path="/opt/freeling/etc/freeling/config"
+
+
+Configure "InsideOut10 for Stanbol: Freeling PoS Tagging Engine", by giving a name to its instance, e.g. "freeling-postagging".
+
+#### 
 
 Configure "PartOfSpeechTagging Engine"
 
@@ -213,5 +275,5 @@ start manually
 ## Execution
 
 ```sh
-java -Djava.library.path=/usr/local/lib -Xmx1g -jar ../../stanbol-HEAD/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
+java -Xmx1g -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
 ```
