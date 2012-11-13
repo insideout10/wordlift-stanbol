@@ -82,7 +82,7 @@ export MAVEN_OPTS="-Xmx512M -XX:MaxPermSize=128M"
 
 In case of errors during the compilation try to raise the values, e.g.
 ```sh
-export MAVEN_OPTS="-Xmx512M -XX:MaxPermSize=128M"
+export MAVEN_OPTS="-Xmx1024M -XX:MaxPermSize=512M"
 ```
 
 ### Install Stanbol
