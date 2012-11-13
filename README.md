@@ -154,6 +154,7 @@ Follow instructions here http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf
 
 In a terminal window, move to the *data* subfolder of the Freeling sources and type:
 ```sh
+cd freeling-HEAD/data
 make install
 ```
 
@@ -200,18 +201,6 @@ jar -> $(JAVADIR)/bin/jar
 mvn install:install-file  -Dfile=freeling.jar -DgroupId=edu.upc.freeling -DartifactId=edu.upc.freeling -Dversion=3.0 -Dpackaging=jar
 ```
 
-### Install Apache Stanbol Engines (Freebase, Freeling, Schema.org, WordLift)
-
-Checkout sources:
-```sh
-git clone https://github.com/insideout10/wordlift-stanbol.git
-```
-
-Compile and install; replace {server} with your server name:
-```sh
-mvn clean install -PinstallBundle -Dsling.url=http://{server}/system/console
-```
-
 ## Configuration
 
 ### Freeling Configuration
@@ -229,26 +218,43 @@ In the *etc* folder, create a *symbolic link* to `/usr/local/share/freeling` (or
 Most of the configuration can be dones on
 http://{server}/system/console/components
 
+#### Freebase Entity Recognition engine
+
+Configure "InsideOut10 for Stanbol: Freebase Entity Recognition engine", by giving a name to its instance, e.g. "freebase-entityrecognition", then start it.
+
 #### Freeling Language Identifier engine
 
-Configure "InsideOut10 for Stanbol: Freeling Language Identifier engine"
-provide path to languageIdentifierConfiguration.cfg
+Edit (or create) the file:
+`stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/freeling/impl/LanguageIdentifierImpl.config`
 
-stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/freeling/impl/LanguageIdentifierImpl.config
-
+Set the following configuration parameters. Please ensure that the specified paths and files exist:
+```
 service.bundleLocation="inputstream:freeling-engine-1.0-SNAPSHOT.jar"
 io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.locale="default"service.pid="
 io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.LanguageIdentifierImpl"
 io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.path="/opt/freeling/etc/languageIdentifierConfiguration.cfg"
+```
 
-Configure "InsideOut10 for Stanbol: Schema.org refactorer engine"
-give a name to the engine instance
+#### Schema.org Refactorer engine
 
-Configure "InsideOut10 for Stanbol: Schema.org refactorer engine impl"
-provide paths to
- custom-mappings.rdf
- custom-rules.rules
- dbpedia-mappings.rdf
+Configure "InsideOut10 for Stanbol: Schema.org refactorer engine", by giving a name to its instance, e.g. "schemaorg-refactorer", then start it.
+
+##### Schema.org Refafactorer implementation component
+
+Edit (or create) the file:
+`/opt/stanbol/var/run/1/stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/schemaorg/impl/SchemaOrgRefactorerImpl.config`
+
+Set the following configuration parameters. Please ensure that the specified paths and files exist:
+```
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.mappings.dbpedia.path="/opt/freeling/etc/dbpedia-mappings.rdf"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.rules.custom.path="/opt/freeling/etc/custom-rules.rules"
+service.bundleLocation="inputstream:schemaorg-engine-1.0-SNAPSHOT.jar"
+service.pid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.impl.SchemaOrgRefactorerImpl"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.mappings.custom.path="/opt/freeling/etc/custom-mappings.rdf"
+io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.type.uri=["http://schema.org/Place","http://schema.org/GeoCoordinates","http://schema.org/Product","http://schema.org/Person","http://schema.org/Organization","http://schema.org/Event","http://schema.org/CreativeWork","http://schema.org/MedicalEntity"]
+```
+
+#### TextAnnotation NewModel engine
 
 Configure "TextAnnotation Model Engine"
 give a name to the engine instance
@@ -267,12 +273,24 @@ io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration
 
 Configure "InsideOut10 for Stanbol: Freeling PoS Tagging Engine", by giving a name to its instance, e.g. "freeling-postagging".
 
-#### 
+#### PoS Tagging engine
 
 Configure "PartOfSpeechTagging Engine"
 
 ApiServiceImpl
 start manually
+
+### Install Apache Stanbol Engines (Freebase, Freeling, Schema.org, WordLift)
+
+Checkout sources:
+```sh
+git clone https://github.com/insideout10/wordlift-stanbol.git
+```
+
+Compile and install; replace {server} with your server name:
+```sh
+mvn clean install -PinstallBundle -Dsling.url=http://{server}/system/console
+```
 
 ## Execution
 
