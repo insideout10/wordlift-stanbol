@@ -198,7 +198,12 @@ jar -> $(JAVADIR)/bin/jar
 #### Load the Java APIs in the Maven repository
 
 ```sh
-mvn install:install-file  -Dfile=freeling.jar -DgroupId=edu.upc.freeling -DartifactId=edu.upc.freeling -Dversion=3.0 -Dpackaging=jar
+mvn install:install-file \
+    -Dfile=freeling.jar \
+    -DgroupId=edu.upc.freeling \
+    -DartifactId=edu.upc.freeling \
+    -Dversion=3.0 \
+    -Dpackaging=jar
 ```
 
 ## Configuration
