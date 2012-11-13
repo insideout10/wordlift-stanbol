@@ -222,8 +222,7 @@ In the *etc* folder, create a *symbolic link* to `/usr/local/share/freeling` (or
 
 ### Stanbol Configuration
 
-Most of the configuration can be dones on
-http://{server}/system/console/components
+Most of the configuration can be done by opening the following url with a Web browser when Apache Stanbol is running: `http://{server}/system/console/components`.
 
 #### Freebase Entity Recognition engine
 
@@ -233,6 +232,8 @@ Configure "InsideOut10 for Stanbol: Freebase Entity Recognition engine", by givi
 
 Edit (or create) the file:
 `stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/freeling/impl/LanguageIdentifierImpl.config`
+
+from the run folder `/opt/stanbol/var/run/1/`.
 
 Set the following configuration parameters. Please ensure that the specified paths and files exist:
 ```
@@ -249,7 +250,9 @@ Configure "InsideOut10 for Stanbol: Schema.org refactorer engine", by giving a n
 ##### Schema.org Refafactorer implementation component
 
 Edit (or create) the file:
-`/opt/stanbol/var/run/1/stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/schemaorg/impl/SchemaOrgRefactorerImpl.config`
+`stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/schemaorg/impl/SchemaOrgRefactorerImpl.config`
+
+from the run folder `/opt/stanbol/var/run/1/`.
 
 Set the following configuration parameters. Please ensure that the specified paths and files exist:
 ```
@@ -268,15 +271,19 @@ give a name to the engine instance
 
 #### Freeling PoS Tagging engine
 
-stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/freeling/impl/PartOfSpeechTaggingImpl.config
+Edit (or create) the file:
+`stanbol/config/io/insideout/wordlift/org/apache/stanbol/enhancer/engines/freeling/impl/PartOfSpeechTaggingImpl.config`
 
+from the run folder `/opt/stanbol/var/run/1/`.
+
+```
 service.bundleLocation="inputstream:freeling-engine-1.0-SNAPSHOT.jar"
 service.pid="io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl.PartOfSpeechTaggingImpl"
 io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.languages=["en","es","it","pt","ru"]
 io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.file.suffix=".cfg"
 io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.share.path="/opt/freeling/etc/freeling"
 io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.path="/opt/freeling/etc/freeling/config"
-
+```
 
 Configure "InsideOut10 for Stanbol: Freeling PoS Tagging Engine", by giving a name to its instance, e.g. "freeling-postagging".
 
