@@ -89,30 +89,50 @@ export MAVEN_OPTS="-Xmx1024M -XX:MaxPermSize=512M"
 
 For reference: http://stanbol.apache.org/docs/trunk/tutorial.html
 
-Checkout Stanbol:
+We suggest to create the following folder where to keep Apache Stanbol files:
 ```sh
-svn co http://svn.apache.org/repos/asf/stanbol/trunk stanbol
+ /opt/stanbol/bin
 ```
 
+Then checkout Apache Stanbol in that folder:
+```sh
+svn co http://svn.apache.org/repos/asf/stanbol/trunk /opt/stanbol/bin/stanbol
+```
+
+Once the checkout is complete, run the installation *with tests**:
 ```sh
 mvn clean install
 ```
 
--- or --
-
+or *without tests*:
 ```sh
 mvn -DskipTests clean install
 ```
 
+In case of memory errors during the installation, try to change the **maven** options as described in the requirements paragraph above.
+
 ### Run Stanbol
 
+Create a *symbolic link* **stable** to Apache Stanbol (this will allow you in the future to update and test your installation before switching to a new release):
 ```sh
-java -Xmx1g -jar stable/target/org.apache.stanbol.launchers.stable-{snapshot-version}-SNAPSHOT.jar
+ ln -s /opt/stanbol/bin/stanbol /opt/stanbol/bin/stable
 ```
 
-Check that it works at
-http://localhost:8080
+Create a *run* folder for Apache Stanbol:
+```sh
+ /opt/stanbol/var/run/1
+```
 
+Then launch Apache Stanbol from the *run* folder; replace {version} with the current version of Apache Stanbol:
+```sh
+cd /opt/stanbol/var/run/1
+java -Xmx1g -jar ../../../bin/stable/target/org.apache.stanbol.launchers.stable-{version}-SNAPSHOT.jar
+```
+
+Check that Apache Stanbol is working by opening the following URL with your browser (replace *localhost* with the server name):
+```sh
+http://localhost:8080
+```
 
 ## Install Freeling
 
