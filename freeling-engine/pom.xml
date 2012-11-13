@@ -63,7 +63,8 @@
 							edu.upc.freeling
 						</Private-Package>
 						<Bundle-NativeCode>
-							lib/libfreeling_javaAPI.jnilib;osname=MacOSX;processor=x86;processor=x86-64
+							lib/libfreeling_javaAPI.jnilib;osname=MacOSX;processor=x86;processor=x86-64,
+							lib/libfreeling_javaAPI.so;osname=Linux;processor=x86;processor=x86-64
 						</Bundle-NativeCode>
 					</instructions>
 				</configuration>
@@ -72,6 +73,15 @@
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-scr-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -86,7 +96,7 @@
 		<dependency>
 			<groupId>edu.upc.freeling</groupId>
 			<artifactId>edu.upc.freeling</artifactId>
-			<version>3.0-SNAPSHOT</version>
+			<version>3.0</version>
 		</dependency>
 
 		<!-- <dependency> <groupId>org.apache.stanbol</groupId> <artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId> 
@@ -139,5 +149,7 @@
 			</dependency> <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> 
 			</dependency> -->
 	</dependencies>
+
+
 
 </project>

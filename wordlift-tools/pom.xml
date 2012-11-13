@@ -58,6 +58,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
+		</dependency>
+
 		<!-- ##### W O R D L I F T ##### -->
 		<dependency>
 			<groupId>io.insideout.wordlift</groupId>

@@ -324,28 +324,11 @@ You can safely stop unused engines to reduce resource usage and start-up times.
 java -Xmx1g -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
 ```
 
-## Sample
+## Notes
 
-A sample language configuration file includes references to the following files:
+It seems that the UKB configuration in the Italian dictionary is causing a fault in Apache Stanbol. Please comment out the following line from file `/opt/freeling/etc/freeling/config/it.cfg`:
 ```
-TokenizerFile=$FREELINGSHARE/it/tokenizer.dat
-SplitterFile=$FREELINGSHARE/it/splitter.dat
-LocutionsFile=$FREELINGSHARE/it/locucions.dat 
-QuantitiesFile=$FREELINGSHARE/common/quantities_default.dat
-AffixFile=$FREELINGSHARE/it/afixos.dat
-ProbabilityFile=$FREELINGSHARE/it/probabilitats.dat
-NPDataFile=$FREELINGSHARE/it/np.dat
-PunctuationFile=$FREELINGSHARE/common/punct.dat
-DictionaryFile=$FREELINGSHARE/it/dicc.src
-*** CorrectorFile=$FREELINGSHARE/it/corrector/corrector.dat
-*** PhoneticsFile=$FREELINGSHARE/it/phonetics.dat
-SenseConfigFile=$FREELINGSHARE/it/senses.dat
-UKBConfigFile=$FREELINGSHARE/it/ukb.dat
-TaggerHMMFile=$FREELINGSHARE/it/tagger.dat
-TaggerRelaxFile=$FREELINGSHARE/it/constr_gram.dat
-*** GrammarFile=$FREELINGSHARE/it/chunker/grammar-chunk.dat
-*** DepTxalaFile=$FREELINGSHARE/it/dep/dependences.dat
-*** CorefFile=$FREELINGSHARE/it/coref/coref.dat
+# UKBConfigFile=$FREELINGSHARE/it/ukb.dat
 ```
 
 Ensure that all the files are found, or the underlying Freeling framework may fail and terminate Apache Stanbol in an unexpected way.

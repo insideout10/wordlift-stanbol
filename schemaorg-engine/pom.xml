@@ -54,6 +54,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.stanbol</groupId>
+			<artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>wordlift-shared</artifactId>
 			<version>${project.version}</version>

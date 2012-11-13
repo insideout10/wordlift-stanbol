@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.apache.stanbol</groupId>
 		<artifactId>stanbol-parent</artifactId>
-		<version>2-incubating-SNAPSHOT</version>
-		<relativePath>../../stanbol/stanbol-head/parent</relativePath>
+		<version>2-SNAPSHOT</version>
+		<relativePath>../../stanbol/stanbol-HEAD/parent</relativePath>
 	</parent>
 
 	<groupId>io.insideout.wordlift</groupId>
@@ -15,65 +16,90 @@
 	<packaging>pom</packaging>
 	<name>InsideOut10 for Apache Stanbol : WordLift (parent)</name>
 
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<stanbol-commons-version>0.10.1-SNAPSHOT</stanbol-commons-version>
+		<stanbol-data-version>1.0.5-SNAPSHOT</stanbol-data-version>
+		<stanbol-enhancer-version>0.10.0-SNAPSHOT</stanbol-enhancer-version>
+		<stanbol-entityhub-version>0.11.0-SNAPSHOT</stanbol-entityhub-version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.apache.stanbol</groupId>
-				<artifactId>org.apache.stanbol.commons.stanboltools.offline</artifactId>
-				<version>0.9.0-incubating</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.stanbol</groupId>
-				<artifactId>org.apache.stanbol.entityhub.model.clerezza</artifactId>
-				<version>0.9.0-incubating</version>
-				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.stanbol</groupId>
 				<artifactId>org.apache.stanbol.commons.web.base</artifactId>
-				<version>0.9.0-incubating</version>
-				<scope>compile</scope>
+				<version>${stanbol-commons-version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.stanbol</groupId>
-				<artifactId>org.apache.stanbol.enhancer.test</artifactId>
-				<version>0.10.0-incubating-SNAPSHOT</version>
+				<artifactId>org.apache.stanbol.data.sites.dbpedia</artifactId>
+				<version>${stanbol-data-version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.stanbol</groupId>
 				<artifactId>org.apache.stanbol.enhancer.core</artifactId>
-				<version>0.10.0-incubating-SNAPSHOT</version>
+				<version>${stanbol-enhancer-version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.stanbol</groupId>
+				<artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
+				<version>${stanbol-enhancer-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.stanbol</groupId>
+				<artifactId>org.apache.stanbol.enhancer.rdfentities</artifactId>
+				<version>${stanbol-enhancer-version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.stanbol</groupId>
+				<artifactId>org.apache.stanbol.enhancer.test</artifactId>
+				<version>${stanbol-enhancer-version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.stanbol</groupId>
 				<artifactId>org.apache.stanbol.entityhub.core</artifactId>
-				<version>0.11.0-incubating-SNAPSHOT</version>
+				<version>${stanbol-entityhub-version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.stanbol</groupId>
 				<artifactId>org.apache.stanbol.entityhub.yard.solr</artifactId>
-				<version>0.11.0-incubating-SNAPSHOT</version>
+				<version>${stanbol-entityhub-version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.stanbol</groupId>
-				<artifactId>org.apache.stanbol.data.sites.dbpedia</artifactId>
-				<version>1.0.5-incubating-SNAPSHOT</version>
-				<scope>test</scope>
+				<artifactId>org.apache.stanbol.entityhub.model.clerezza</artifactId>
+				<version>${stanbol-entityhub-version}</version>
+				<scope>compile</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.apache.stanbol</groupId>
-				<artifactId>org.apache.stanbol.enhancer.rdfentities</artifactId>
-				<version>0.10.0-incubating-SNAPSHOT</version>
-				<scope>test</scope>
-			</dependency>
+
+
+			<!-- <dependency> <groupId>org.apache.stanbol</groupId> <artifactId>org.apache.stanbol.commons.stanboltools.offline</artifactId> 
+				<version>0.9.0-incubating</version> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.entityhub.model.clerezza</artifactId> <version>0.9.0-incubating</version> 
+				<scope>compile</scope> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.commons.web.base</artifactId> <version>0.9.0-incubating</version> 
+				<scope>compile</scope> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.enhancer.test</artifactId> <version>0.10.0-incubating-SNAPSHOT</version> 
+				<scope>test</scope> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.enhancer.core</artifactId> <version>0.10.0-incubating-SNAPSHOT</version> 
+				<scope>test</scope> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.entityhub.core</artifactId> <version>0.11.0-incubating-SNAPSHOT</version> 
+				<scope>test</scope> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.entityhub.yard.solr</artifactId> <version>0.11.0-incubating-SNAPSHOT</version> 
+				<scope>test</scope> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.data.sites.dbpedia</artifactId> <version>1.0.5-incubating-SNAPSHOT</version> 
+				<scope>test</scope> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
+				<artifactId>org.apache.stanbol.enhancer.rdfentities</artifactId> <version>0.10.0-incubating-SNAPSHOT</version> 
+				<scope>test</scope> </dependency> -->
 		</dependencies>
 	</dependencyManagement>
 
@@ -82,21 +108,6 @@
 		<dependency>
 			<groupId>org.apache.clerezza</groupId>
 			<artifactId>rdf.core</artifactId>
-		</dependency>
-
-		<!-- ##### A P A C H E - S T A N B O L ##### -->
-		<dependency>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
-			<version>0.10.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.stanbol</groupId>
-			<artifactId>org.apache.stanbol.entityhub.servicesapi</artifactId>
-			<version>0.11.0-incubating-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -121,7 +132,20 @@
 		<module>schemaorg-engine</module>
 		<module>wordlift-webfragment</module>
 		<module>wordlift-webapi</module>
-    <module>textannotations-futuremodel</module>
-  </modules>
+		<module>textannotations-futuremodel</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
