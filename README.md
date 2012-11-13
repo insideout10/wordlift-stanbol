@@ -134,16 +134,16 @@ Check that Apache Stanbol is working by opening the following URL with your brow
 http://localhost:8080
 ```
 
-## Install Freeling
+### Install Freeling
 
 Reference:
 http://nlp.lsi.upc.edu/freeling/index.php?option=com_content&task=view&id=25&Itemid=62
 
-### Install on Ubuntu 12.04
+#### Install on Ubuntu 12.04
 
 Follow instructions here http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf
 
-### Install on Mac OS X
+#### Install on Mac OS X
 
 use Brew
 
