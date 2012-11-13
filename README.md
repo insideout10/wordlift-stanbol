@@ -101,7 +101,7 @@ Then checkout Apache Stanbol in that folder:
 svn co http://svn.apache.org/repos/asf/stanbol/trunk /opt/stanbol/bin/stanbol
 ```
 
-Once the checkout is complete, run the installation *with tests**:
+Once the checkout is complete, run the installation *with tests*:
 ```sh
 mvn clean install
 ```
@@ -128,12 +128,14 @@ Create a *run* folder for Apache Stanbol:
 Then launch Apache Stanbol from the *run* folder; replace {version} with the current version of Apache Stanbol:
 ```sh
 cd /opt/stanbol/var/run/1
-java -Xmx1g -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-{version}.jar
+java -Xmx1g \
+     -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-{version}.jar
 ```
 
 For example, to run *0.10.0-SNAPSHOT*:
 ```sh
-java -Xmx1g -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
+java -Xmx1g \
+     -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
 ```
 
 Check that Apache Stanbol is working by opening the following URL with your browser (replace *localhost* with the server name):
@@ -216,7 +218,7 @@ Create the following folders:
   - etc
 ```
 
-In the *etc* folder, create a *symbolic link* to `/usr/local/share/freeling` (or where the share/freeling folder is located, e.g. /usr/local/Cellar/freeling/3.0/share/freeling on a Mac OS X install using *brew*).
+In the *etc* folder, create a *symbolic link* to `/usr/local/share/freeling` (or where the share/freeling folder is located, e.g. `/usr/local/Cellar/freeling/3.0/share/freeling` on a Mac OS X install using *brew*).
 
 ### Stanbol Configuration
 
