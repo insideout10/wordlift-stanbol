@@ -129,13 +129,13 @@ Then launch Apache Stanbol from the *run* folder; replace {version} with the cur
 ```sh
 cd /opt/stanbol/var/run/1
 java -Xmx1g \
-     -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-{version}.jar
+ -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-{version}.jar
 ```
 
 For example, to run *0.10.0-SNAPSHOT*:
 ```sh
 java -Xmx1g \
-     -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
+ -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
 ```
 
 Check that Apache Stanbol is working by opening the following URL with your browser (replace *localhost* with the server name):
@@ -157,16 +157,6 @@ curl -o freeling-3.0.tar.gz http://devel.cpl.upc.edu/freeling/downloads/21
 
 Then extract the archive and follow the instructions at this address to compile and install Freeling:
 `http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf`
-
-##### Install data dictionaries
-
-In a terminal window, move to the *data* subfolder of the Freeling sources and type:
-```sh
-cd freeling-HEAD/data
-make install
-```
-
-The dictionaries will be created by default in `/usr/local/share/freeling`.
 
 #### Install on Mac OS X
 
@@ -333,3 +323,29 @@ You can safely stop unused engines to reduce resource usage and start-up times.
 ```sh
 java -Xmx1g -jar ../../../bin/stable/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
 ```
+
+## Sample
+
+A sample language configuration file includes references to the following files:
+```
+TokenizerFile=$FREELINGSHARE/it/tokenizer.dat
+SplitterFile=$FREELINGSHARE/it/splitter.dat
+LocutionsFile=$FREELINGSHARE/it/locucions.dat 
+QuantitiesFile=$FREELINGSHARE/common/quantities_default.dat
+AffixFile=$FREELINGSHARE/it/afixos.dat
+ProbabilityFile=$FREELINGSHARE/it/probabilitats.dat
+NPDataFile=$FREELINGSHARE/it/np.dat
+PunctuationFile=$FREELINGSHARE/common/punct.dat
+DictionaryFile=$FREELINGSHARE/it/dicc.src
+*** CorrectorFile=$FREELINGSHARE/it/corrector/corrector.dat
+*** PhoneticsFile=$FREELINGSHARE/it/phonetics.dat
+SenseConfigFile=$FREELINGSHARE/it/senses.dat
+UKBConfigFile=$FREELINGSHARE/it/ukb.dat
+TaggerHMMFile=$FREELINGSHARE/it/tagger.dat
+TaggerRelaxFile=$FREELINGSHARE/it/constr_gram.dat
+*** GrammarFile=$FREELINGSHARE/it/chunker/grammar-chunk.dat
+*** DepTxalaFile=$FREELINGSHARE/it/dep/dependences.dat
+*** CorefFile=$FREELINGSHARE/it/coref/coref.dat
+```
+
+Ensure that all the files are found, or the underlying Freeling framework may fail and terminate Apache Stanbol in an unexpected way.
