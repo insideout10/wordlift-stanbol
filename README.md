@@ -59,18 +59,20 @@ Improve the unit tests.
 
 ### Folder structure
 
+```
  + opt/
     + freeling/
        + etc/
-
+          - freeling (symbolic link to share/freeling)
     + wordlift/
        + etc/
     + stanbol/
        + bin/
-          - stable/
+          + rXXXXXXX/
+          - stable (symbolic link to rXXXXXXX)
        + etc/
           - stanbol.conf
-
+```
 
 ### Requirements
 
