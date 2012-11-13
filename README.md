@@ -150,7 +150,13 @@ http://nlp.lsi.upc.edu/freeling/index.php?option=com_content&task=view&id=25&Ite
 
 #### Install on Ubuntu 12.04
 
-Follow instructions here http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf
+Download **Freeling 3.0** from `http://devel.cpl.upc.edu/freeling/downloads/21`:
+```sh
+curl -o freeling-3.0.tar.gz http://devel.cpl.upc.edu/freeling/downloads/21
+```
+
+Then extract the archive and follow the instructions at this address to compile and install Freeling:
+`http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf`
 
 ##### Install data dictionaries
 
@@ -185,13 +191,17 @@ brew install freeling
 
 JDK 6.0 is required.
 
-/root/freeling-HEAD/APIs/java
+Overwrite the `freeling-HEAD/APIs/commong/freeling.i` file with the one provided here:
+`https://raw.github.com/ziodave/freeling-brew-formula/master/APIs/common/freeling.i`
 
-edit and fix the Makefile accordingly
+freeling-HEAD/APIs/java
 
+Fix the `freeling-HEAD/APIs/java/Makefile` file by setting the correct parameters:
+```
 FREELINGDIR=/usr/local
 SWIGDIR=/usr/share/swig2.0
 JAVADIR=/usr/lib/jvm/jdk1.6.0_32
+```
 
 java -> $(JAVADIR)/bin/java
 jar -> $(JAVADIR)/bin/jar
@@ -307,18 +317,16 @@ mvn clean install -PinstallBundle -Dsling.url=http://{server}/system/console
 
 ### Configure the default chain
 
-Reconfigure the default chain to use the following engines:
-`freebase-entityrecognition, freeling-postagging, textannotations-newmodel, schemaorg-refactorer, freelingLanguageIdentifier`
+From the Apache Stanbol web site, reconfigure the default chain to use the following engines:
+`freelingLanguageIdentifier, freeling-postagging, freebase-entityrecognition, textannotations-newmodel, schemaorg-refactorer`
 
-You can change the chain line:
-```
-stanbol.enhancer.chain.weighted.chain=["freebase-entityrecognition", "freeling-postagging", "textannotations-newmodel", "schemaorg-refactorer", "freelingLanguageIdentifier"]
-```
+### Configure the cache strategy for the DBpedia site
 
-in the configuration file:
-`stanbol/config/org/apache/stanbol/enhancer/chain/weighted/impl/WeightedChain/1665b7cf-e211-4c7a-a63f-5cc0394ad3be.config`.
+It is suggested to change the cache strategy for the DBpedia referenced site from *All* to *Used* or *None*.
 
-from the run folder `/opt/stanbol/var/run/1`.
+### Stop unused engines
+
+You can safely stop unused engines to reduce resource usage and start-up times.
 
 ## Execution
 
