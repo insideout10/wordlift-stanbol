@@ -54,3 +54,131 @@ One installation is complete, open the Apache Felix components page to configure
 Improve the unit tests.
 
 ## License
+
+## Installation
+
+### Folder structure
+
+ + opt/
+    + freeling/
+       + etc/
+
+    + wordlift/
+       + etc/
+    + stanbol/
+       + bin/
+          - stable/
+       + etc/
+          - stanbol.conf
+
+
+### Installation
+
+#### Requirements
+
+##### Maven 3
+
+export MAVEN_OPTS="-Xmx512M -XX:MaxPermSize=128M"
+
+In case of errors during the compilation try to raise the values, e.g.
+export MAVEN_OPTS="-Xmx512M -XX:MaxPermSize=128M"
+
+#### Install Stanbol
+
+For reference: http://stanbol.apache.org/docs/trunk/tutorial.html
+
+Checkout Stanbol:
+svn co http://svn.apache.org/repos/asf/stanbol/trunk stanbol
+
+mvn clean install
+-- or --
+mvn -DskipTests clean install
+
+#### Run Stanbol
+
+java -Xmx1g -jar stable/target/org.apache.stanbol.launchers.stable-{snapshot-version}-SNAPSHOT.jar
+
+Check that it works at
+http://localhost:8080
+
+
+### Install Freeling
+
+Reference:
+http://nlp.lsi.upc.edu/freeling/index.php?option=com_content&task=view&id=25&Itemid=62
+
+#### Install on Ubuntu 12.04
+
+Follow instructions here http://nlp.lsi.upc.edu/freeling/doc/userman/userman.pdf
+
+#### Install on Mac OS X
+
+use Brew
+
+chmod 755 install-sh
+
+Brew
+
+icu4c 49.1.2
+brew install icu4c
+
+brew install --HEAD boost --with-icu
+
+brew install https://raw.github.com/mxcl/homebrew/0d8d92bfcd00f42d6af777ba8bf548cbd5502638/Library/Formula/swig.rb
+
+brew install freeling
+
+#### Freeling Java APIs
+
+##### Install Java APIs
+
+JDK 6.0 is required.
+
+/root/freeling-HEAD/APIs/java
+
+edit and fix the Makefile accordingly
+
+FREELINGDIR=/usr/local
+SWIGDIR=/usr/share/swig2.0
+JAVADIR=/usr/lib/jvm/jdk1.6.0_32
+
+java -> $(JAVADIR)/bin/java
+jar -> $(JAVADIR)/bin/jar
+
+
+ln -s /Users/david/Developer/freeling/APIs/java/libfreeling_javaAPI.so /usr/local/lib/libfreeling_javaAPI.so
+
+##### Load the Java APIs in the Maven repository
+
+mvn install:install-file  -Dfile=freeling.jar -DgroupId=edu.upc.freeling -DartifactId=edu.upc.freeling -Dversion=3.0 -Dpackaging=jar
+
+
+### Configuration
+
+Configure "InsideOut10 for Stanbol: Freeling Language Identifier engine"
+provide path to languageIdentifierConfiguration.cfg
+
+
+Configure "InsideOut10 for Stanbol: Schema.org refactorer engine"
+give a name to the engine instance
+
+Configure "InsideOut10 for Stanbol: Schema.org refactorer engine impl"
+provide paths to
+ custom-mappings.rdf
+ custom-rules.rules
+ dbpedia-mappings.rdf
+
+Configure "TextAnnotation Model Engine"
+give a name to the engine instance
+
+Configure "InsideOut10 for Stanbol: Freeling PoS Tagging Engine"
+give a name to the engine instance
+
+Configure "PartOfSpeechTagging Engine"
+
+ApiServiceImpl
+start manually
+
+### Execution
+
+java -Djava.library.path=/usr/local/lib -Xmx1g -jar ../../stanbol-HEAD/launchers/stable/target/org.apache.stanbol.launchers.stable-0.10.0-SNAPSHOT.jar
