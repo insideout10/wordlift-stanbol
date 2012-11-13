@@ -305,6 +305,21 @@ Compile and install; replace {server} with your server name:
 mvn clean install -PinstallBundle -Dsling.url=http://{server}/system/console
 ```
 
+### Configure the default chain
+
+Reconfigure the default chain to use the following engines:
+`freebase-entityrecognition, freeling-postagging, textannotations-newmodel, schemaorg-refactorer, freelingLanguageIdentifier`
+
+You can change the chain line:
+```
+stanbol.enhancer.chain.weighted.chain=["freebase-entityrecognition", "freeling-postagging", "textannotations-newmodel", "schemaorg-refactorer", "freelingLanguageIdentifier"]
+```
+
+in the configuration file:
+`stanbol/config/org/apache/stanbol/enhancer/chain/weighted/impl/WeightedChain/1665b7cf-e211-4c7a-a63f-5cc0394ad3be.config`.
+
+from the run folder `/opt/stanbol/var/run/1`.
+
 ## Execution
 
 ```sh
