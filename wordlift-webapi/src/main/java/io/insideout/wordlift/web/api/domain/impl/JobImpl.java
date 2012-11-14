@@ -4,42 +4,60 @@ import io.insideout.wordlift.web.api.domain.Job;
 import io.insideout.wordlift.web.api.domain.JobRequest;
 import io.insideout.wordlift.web.api.domain.JobStatus;
 
+import org.apache.clerezza.rdf.core.MGraph;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class JobImpl implements Job {
 
-    private String jobID;
-    private JobStatus status;
-    private JobRequest jobRequest;
+	private String jobID;
+	private JobStatus status;
+	private JobRequest jobRequest;
 
-    public JobImpl() {}
+	@JsonIgnore
+	private MGraph resultGraph;
 
-    @Override
-    public String getJobID() {
-        return jobID;
-    }
+	public JobImpl() {
+	}
 
-    @Override
-    public void setJobID(String jobID) {
-        this.jobID = jobID;
-    }
+	@Override
+	public String getJobID() {
+		return jobID;
+	}
 
-    @Override
-    public JobStatus getStatus() {
-        return status;
-    }
+	@Override
+	public void setJobID(String jobID) {
+		this.jobID = jobID;
+	}
 
-    @Override
-    public void setStatus(JobStatus status) {
-        this.status = status;
-    }
+	@Override
+	public JobStatus getStatus() {
+		return status;
+	}
 
-    @Override
-    public JobRequest getJobRequest() {
-        return jobRequest;
-    }
+	@Override
+	public void setStatus(JobStatus status) {
+		this.status = status;
+	}
 
-    @Override
-    public void setJobRequest(JobRequest jobRequest) {
-        this.jobRequest = jobRequest;
-    }
+	@Override
+	public JobRequest getJobRequest() {
+		return jobRequest;
+	}
+
+	@Override
+	public void setJobRequest(JobRequest jobRequest) {
+		this.jobRequest = jobRequest;
+	}
+
+	@Override
+	public MGraph getResultGraph() {
+		return resultGraph;
+	}
+
+	@Override
+	public void setResultGraph(final MGraph graph) {
+		this.resultGraph = graph;
+	}
 
 }

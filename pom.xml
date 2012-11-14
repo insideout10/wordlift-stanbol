@@ -20,6 +20,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<jackson-version>2.1.1</jackson-version>
+		<jersey-version>1.12</jersey-version>
 		<stanbol-commons-version>0.10.1-SNAPSHOT</stanbol-commons-version>
 		<stanbol-data-version>1.0.5-SNAPSHOT</stanbol-data-version>
 		<stanbol-enhancer-version>0.10.0-SNAPSHOT</stanbol-enhancer-version>
@@ -81,6 +83,47 @@
 				<scope>compile</scope>
 			</dependency>
 
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-servlet</artifactId>
+				<version>${jersey-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>${jersey-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-json</artifactId>
+				<version>${jersey-version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.jaxrs</groupId>
+				<artifactId>jackson-jaxrs-json-provider</artifactId>
+				<version>${jackson-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.jaxrs</groupId>
+				<artifactId>jackson-jaxrs-json-provider</artifactId>
+				<version>${jackson-version}</version>
+			</dependency>
 
 			<!-- <dependency> <groupId>org.apache.stanbol</groupId> <artifactId>org.apache.stanbol.commons.stanboltools.offline</artifactId> 
 				<version>0.9.0-incubating</version> </dependency> <dependency> <groupId>org.apache.stanbol</groupId> 
