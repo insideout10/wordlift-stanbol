@@ -140,7 +140,7 @@ brew install https://raw.github.com/gist/4060323/74e4e36dfe6dee43d604e70ce281157
 
 **Note**:
 
-* there might be issues according on which install of **boost** gets installed and its location.
+* there might be issues according on which version of **boost** gets installed and its location (open an issue, we'll try to help).
 * the `install-sh` file might not have the required permissions (change with `chmod 755 install-sh`)
 
 #### Freeling Java APIs
