@@ -17,44 +17,6 @@ These features work together with the [WordLift](http://wordlift.it) plug-in for
 * **Freeling** is a requirement for the Freeling engine. In order to install and configure Freeling refer to the [installation guide](http://nlp.lsi.upc.edu/freeling/index.php?option=com_content&task=view&id=15&Itemid=44) and to the [support forums](http://nlp.lsi.upc.edu/freeling/index.php?option=com_simpleboard&Itemid=65&func=showcat&catid=5).
 * general installation tasks make use of [Maven](http://maven.apache.org/what-is-maven.html) and of [Apache Felix](http://felix.apache.org/site/index.html), therefore some minimal knowledge and understanding of these software is required.
 
-### Installation
-
-Following are the instructions to download and install the WordLift components for Stanbol.
-
-#### Get the source code
-
-Get the source code from Git:
-
-```sh
-git clone https://github.com/insideout10/wordlift-stanbol.git
-```
-
-#### Edit the pom.xml
-
-The sources need to find the Stanbol source tree on your computer. Change the *relativePath* in the [pom.xml](https://github.com/insideout10/wordlift-stanbol/blob/master/pom.xml) to point to the *stanbol/parent* folder.
-
-#### Run Stanbol
-
-Stanbol must be running before you start the installation of components. Ensure Stanbol is available at *http://localhost:8080/*.
-
-#### Start installation
-
-Start the build and installation of components by running the following command:
-
-```sh
-mvn clean install -DskipTests -PinstallBundle -Dsling.url=http://localhost:8080/system/console -o -e
-```
-
-#### Configuration
-
-One installation is complete, open the Apache Felix components page to configure and start the single components at http://localhost:8080/system/console/components.
-
-## RoadMap
-
-Improve the unit tests.
-
-## License
-
 ## Installation
 
 ### Folder structure
@@ -73,6 +35,12 @@ Improve the unit tests.
        + etc/
           - stanbol.conf
 ```
+
+You can clone and customize the above structure using the following projects:
+
+* **freeling**: https://github.com/insideout10/freeling-home
+* **stanbol**: https://github.com/insideout10/stanbol-home
+* **wordlift**: https://github.com/insideout10/wordlift-home
 
 ### Requirements
 
@@ -160,20 +128,20 @@ Then extract the archive and follow the instructions at this address to compile 
 
 #### Install on Mac OS X
 
-use Brew
+Use brew, http://mxcl.github.com/homebrew/.
 
-chmod 755 install-sh
-
-Brew
-
-icu4c 49.1.2
+Install:
+```sh
 brew install icu4c
-
-brew install --HEAD boost --with-icu
-
+brew install boost --with-icu
 brew install https://raw.github.com/mxcl/homebrew/0d8d92bfcd00f42d6af777ba8bf548cbd5502638/Library/Formula/swig.rb
+brew install https://raw.github.com/gist/4060323/74e4e36dfe6dee43d604e70ce281157db7ecf668/freeling.rb
+```
 
-brew install freeling
+**Note**:
+
+* there might be issues according on which install of **boost** gets installed and its location.
+* the `install-sh` file might not have the required permissions (change with `chmod 755 install-sh`)
 
 #### Freeling Java APIs
 
@@ -184,20 +152,26 @@ JDK 6.0 is required.
 Overwrite the `freeling-HEAD/APIs/commong/freeling.i` file with the one provided here:
 `https://raw.github.com/ziodave/freeling-brew-formula/master/APIs/common/freeling.i`
 
-freeling-HEAD/APIs/java
+Change to `freeling-3.0/APIs/java`.
 
 Fix the `freeling-HEAD/APIs/java/Makefile` file by setting the correct parameters:
 ```
 FREELINGDIR=/usr/local
 SWIGDIR=/usr/share/swig2.0
 JAVADIR=/usr/lib/jvm/jdk1.6.0_32
-```
+
+...
 
 java -> $(JAVADIR)/bin/java
 jar -> $(JAVADIR)/bin/jar
+```
 
+Then run
+```sh
+make
+```
 
-#### Load the Java APIs in the Maven repository
+#### Load the Java APIs in the local Maven cache
 
 ```sh
 mvn install:install-file \
