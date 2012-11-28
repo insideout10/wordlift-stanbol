@@ -144,9 +144,11 @@ brew install https://raw.github.com/gist/4060323/74e4e36dfe6dee43d604e70ce281157
 To do that, follow these steps:
  1. ensure boost is not installed: `brew uninstall boost`
  2. install from this formula: 
+
 ```sh
 brew install https://github.com/manphiz/homebrew/blob/e40bc41d84e32902d73d8c3868843470a269a449/Library/Formula/boost.rb --with-icu
 ```
+
 * the `install-sh` file might not have the required permissions (change with `chmod 755 install-sh`)
 
 #### Freeling Java APIs
