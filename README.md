@@ -192,7 +192,7 @@ Then run
 make
 ```
 
-#### Load the Java APIs in the local Maven cache
+#### Load the Java APIs in the local Maven cache (optional)
 
 ```sh
 mvn install:install-file \
