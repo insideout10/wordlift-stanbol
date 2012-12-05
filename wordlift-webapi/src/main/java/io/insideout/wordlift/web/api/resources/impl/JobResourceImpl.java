@@ -25,6 +25,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
+import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,14 +98,14 @@ public class JobResourceImpl {
 				.getService(JobExecutor.class);
 
 		final Job newJob = jobService.createJobFromJobRequest(jobRequest);
-		final Future<Job> jobResult = jobExecutor.runJob(newJob);
+		final String jobID = newJob.getJobID();
+		final String mimeType = newJob.getJobRequest().getMimeType();
 
-		final Job completedJob = jobResult.get();
+		final Future<ContentItem> jobResult = jobExecutor.runJob(newJob);
 
-		final String jobID = completedJob.getJobID();
-		final String mimeType = completedJob.getJobRequest().getMimeType();
-
-		final int graphSize = completedJob.getResultGraph().size();
+		final ContentItem contentItem = jobResult.get();
+		final int graphSize = contentItem.getMetadata().size();
+		final String contentItemUri = contentItem.getUri().toString();
 
 		final StreamingOutput streamingOutput = new StreamingOutput() {
 
@@ -118,9 +119,9 @@ public class JobResourceImpl {
 				logger.debug("Got a Serializer [ {} ].", serializer);
 
 				logger.debug("Found a job [ {} ][ jobID :: {} ].",
-						new Object[] { completedJob, jobID });
+						new Object[] { newJob, jobID });
 
-				final MGraph graph = completedJob.getResultGraph();
+				final MGraph graph = contentItem.getMetadata();
 
 				// final ByteArrayOutputStream outputStream = new
 				// ByteArrayOutputStream();
@@ -131,6 +132,7 @@ public class JobResourceImpl {
 
 		return Response.ok().type(mimeType)
 				.header("Data-Processing-Units-Cost", graphSize)
+				.header("Content-Item-Id", contentItemUri)
 				.entity(streamingOutput).build();
 	}
 

@@ -16,7 +16,7 @@ import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JobExecutorThreadImpl implements Callable<Job> {
+public class JobExecutorThreadImpl implements Callable<ContentItem> {
 
 	private ContentItemFactory contentItemFactory;
 
@@ -44,11 +44,11 @@ public class JobExecutorThreadImpl implements Callable<Job> {
 	}
 
 	@Override
-	public Job call() throws Exception {
+	public ContentItem call() throws Exception {
 
 		jobService.setJobStarting(job);
 
-		ContentItem contentItem;
+		final ContentItem contentItem;
 		try {
 			contentItem = contentItemFactory
 					.createContentItem(new StringSource(job.getJobRequest()
@@ -57,7 +57,7 @@ public class JobExecutorThreadImpl implements Callable<Job> {
 			// TODO: fail job.
 			jobService.failJob(job, e);
 			jobService.setJobComplete(job);
-			return job;
+			return null;
 		}
 		if (null == enhancementJobManager) {
 			// TODO: fail job.
@@ -76,12 +76,12 @@ public class JobExecutorThreadImpl implements Callable<Job> {
 			// TODO: fail job.
 			jobService.failJob(job, e);
 			jobService.setJobComplete(job);
-			return job;
+			return contentItem;
 		}
 
 		job.setResultGraph(contentItem.getMetadata());
 
-		return job;
+		return contentItem;
 
 		// sendResults(contentItem, job);
 	}

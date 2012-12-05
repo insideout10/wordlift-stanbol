@@ -4,8 +4,10 @@ import io.insideout.wordlift.web.api.domain.Job;
 
 import java.util.concurrent.Future;
 
+import org.apache.stanbol.enhancer.servicesapi.ContentItem;
+
 public interface JobExecutor {
 
-	public Future<Job> runJob(Job job);
+	public Future<ContentItem> runJob(Job job);
 
 }

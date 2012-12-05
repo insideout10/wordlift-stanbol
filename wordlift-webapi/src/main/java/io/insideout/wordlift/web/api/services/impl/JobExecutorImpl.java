@@ -13,6 +13,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
+import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
 import org.apache.stanbol.enhancer.servicesapi.EnhancementJobManager;
 
@@ -41,7 +42,7 @@ public class JobExecutorImpl implements JobExecutor {
 		executorService = Executors.newFixedThreadPool(100);
 	}
 
-	public Future<Job> runJob(Job job) {
+	public Future<ContentItem> runJob(Job job) {
 
 		final JobExecutorThreadImpl jobRunnable = new JobExecutorThreadImpl(
 				contentItemFactory, enhancementJobManager, chainManager,
