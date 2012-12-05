@@ -3,24 +3,10 @@ package io.insideout.wordlift.web.api.services.impl;
 import io.insideout.wordlift.web.api.domain.Job;
 import io.insideout.wordlift.web.api.services.JobService;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.UnsupportedCharsetException;
+import java.util.concurrent.Callable;
 
 import org.apache.clerezza.rdf.core.serializedform.Serializer;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.stanbol.enhancer.servicesapi.ChainManager;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.enhancer.servicesapi.ContentItemFactory;
@@ -30,7 +16,7 @@ import org.apache.stanbol.enhancer.servicesapi.impl.StringSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JobExecutorThreadImpl implements Runnable {
+public class JobExecutorThreadImpl implements Callable<Job> {
 
 	private ContentItemFactory contentItemFactory;
 
@@ -58,7 +44,8 @@ public class JobExecutorThreadImpl implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	public Job call() throws Exception {
+
 		jobService.setJobStarting(job);
 
 		ContentItem contentItem;
@@ -70,7 +57,7 @@ public class JobExecutorThreadImpl implements Runnable {
 			// TODO: fail job.
 			jobService.failJob(job, e);
 			jobService.setJobComplete(job);
-			return;
+			return job;
 		}
 		if (null == enhancementJobManager) {
 			// TODO: fail job.
@@ -89,88 +76,92 @@ public class JobExecutorThreadImpl implements Runnable {
 			// TODO: fail job.
 			jobService.failJob(job, e);
 			jobService.setJobComplete(job);
-			return;
+			return job;
 		}
 
 		job.setResultGraph(contentItem.getMetadata());
-		sendResults(contentItem, job);
+
+		return job;
+
+		// sendResults(contentItem, job);
 	}
 
-	private void sendResults(ContentItem contentItem, Job job) {
+	// private void sendResults(ContentItem contentItem, Job job) {
+	//
+	// logger.trace("Preparing to send wordlifting results to [{}].", job
+	// .getJobRequest().getCallbackURL());
+	//
+	// String charset = "utf-8";
+	// String mimeType = job.getJobRequest().getMimeType();
+	//
+	// ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	// serializer.serialize(outputStream, contentItem.getMetadata(), mimeType);
+	//
+	// HttpClient httpClient = new DefaultHttpClient();
+	//
+	// String contentItemURI = contentItem.getUri().toString();
+	// try {
+	// contentItemURI = URLEncoder.encode(contentItemURI, "UTF-8");
+	// } catch (UnsupportedEncodingException e) {
+	// logger.warn(
+	// "An exception [{}] occured [ contentItemURI :: {} ]:\n{}",
+	// new Object[] { e.getClass(), contentItemURI, e.getMessage() });
+	// }
+	//
+	// URIBuilder builder;
+	// URI uri;
+	//
+	// try {
+	// String url = job.getJobRequest().getCallbackURL();
+	//
+	// // add the jobID to the URL.
+	// if (0 < url.indexOf("?"))
+	// url += "&jobID=" + job.getJobID() + "&contentItemURI="
+	// + contentItemURI;
+	// else
+	// url += "?jobID=" + job.getJobID();
+	//
+	// builder = new URIBuilder(url);
+	// uri = builder.build();
+	// } catch (URISyntaxException e) {
+	// jobService.failJob(job, e);
+	// jobService.setJobComplete(job);
+	// return;
+	// }
+	//
+	// HttpPost httpPost = new HttpPost(uri);
+	// HttpResponse httpResponse;
+	// StringEntity stringEntity;
+	// try {
+	// stringEntity = new StringEntity(outputStream.toString(charset),
+	// ContentType.create(mimeType, charset));
+	// httpPost.setEntity(stringEntity);
+	// httpResponse = httpClient.execute(httpPost);
+	// } catch (UnsupportedCharsetException e) {
+	// jobService.failJob(job, e);
+	// jobService.setJobComplete(job);
+	// return;
+	// } catch (UnsupportedEncodingException e) {
+	// jobService.failJob(job, e);
+	// jobService.setJobComplete(job);
+	// return;
+	// } catch (ClientProtocolException e) {
+	// jobService.failJob(job, e);
+	// jobService.setJobComplete(job);
+	// return;
+	// } catch (IOException e) {
+	// jobService.failJob(job, e);
+	// jobService.setJobComplete(job);
+	// return;
+	// }
+	//
+	// httpPost.setEntity(stringEntity);
+	//
+	// HttpEntity entity = httpResponse.getEntity();
 
-		logger.trace("Preparing to send wordlifting results to [{}].", job
-				.getJobRequest().getCallbackURL());
-
-		String charset = "utf-8";
-		String mimeType = job.getJobRequest().getMimeType();
-
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		serializer.serialize(outputStream, contentItem.getMetadata(), mimeType);
-
-		HttpClient httpClient = new DefaultHttpClient();
-
-		String contentItemURI = contentItem.getUri().toString();
-		try {
-			contentItemURI = URLEncoder.encode(contentItemURI, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			logger.warn(
-					"An exception [{}] occured [ contentItemURI :: {} ]:\n{}",
-					new Object[] { e.getClass(), contentItemURI, e.getMessage() });
-		}
-
-		URIBuilder builder;
-		URI uri;
-
-		try {
-			String url = job.getJobRequest().getCallbackURL();
-
-			// add the jobID to the URL.
-			if (0 < url.indexOf("?"))
-				url += "&jobID=" + job.getJobID() + "&contentItemURI="
-						+ contentItemURI;
-			else
-				url += "?jobID=" + job.getJobID();
-
-			builder = new URIBuilder(url);
-			uri = builder.build();
-		} catch (URISyntaxException e) {
-			jobService.failJob(job, e);
-			jobService.setJobComplete(job);
-			return;
-		}
-
-		HttpPost httpPost = new HttpPost(uri);
-		HttpResponse httpResponse;
-		StringEntity stringEntity;
-		try {
-			stringEntity = new StringEntity(outputStream.toString(charset),
-					ContentType.create(mimeType, charset));
-			httpPost.setEntity(stringEntity);
-			httpResponse = httpClient.execute(httpPost);
-		} catch (UnsupportedCharsetException e) {
-			jobService.failJob(job, e);
-			jobService.setJobComplete(job);
-			return;
-		} catch (UnsupportedEncodingException e) {
-			jobService.failJob(job, e);
-			jobService.setJobComplete(job);
-			return;
-		} catch (ClientProtocolException e) {
-			jobService.failJob(job, e);
-			jobService.setJobComplete(job);
-			return;
-		} catch (IOException e) {
-			jobService.failJob(job, e);
-			jobService.setJobComplete(job);
-			return;
-		}
-
-		httpPost.setEntity(stringEntity);
-
-		HttpEntity entity = httpResponse.getEntity();
-
-		// TODO: handle the response.
-	}
+	// TODO: handle the response.
+	// }
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
+
 }

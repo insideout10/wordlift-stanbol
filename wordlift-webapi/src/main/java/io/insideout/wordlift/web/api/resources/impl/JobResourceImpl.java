@@ -3,15 +3,15 @@ package io.insideout.wordlift.web.api.resources.impl;
 import io.insideout.wordlift.web.api.BundleAwareApplication;
 import io.insideout.wordlift.web.api.domain.Job;
 import io.insideout.wordlift.web.api.domain.JobRequest;
-import io.insideout.wordlift.web.api.domain.JobResponse;
 import io.insideout.wordlift.web.api.domain.JobStatus;
-import io.insideout.wordlift.web.api.domain.impl.JobResponseImpl;
 import io.insideout.wordlift.web.api.services.JobExecutor;
 import io.insideout.wordlift.web.api.services.JobService;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -88,18 +88,50 @@ public class JobResourceImpl {
 	}
 
 	@POST
-	public JobResponse createNewJob(JobRequest jobRequest) {
+	public Response createNewJob(JobRequest jobRequest)
+			throws InterruptedException, ExecutionException {
 
-		JobService jobService = ((BundleAwareApplication) application)
+		final JobService jobService = ((BundleAwareApplication) application)
 				.getService(JobService.class);
-		JobExecutor jobExecutor = ((BundleAwareApplication) application)
+		final JobExecutor jobExecutor = ((BundleAwareApplication) application)
 				.getService(JobExecutor.class);
 
-		Job job = jobService.createJobFromJobRequest(jobRequest);
-		jobExecutor.runJob(job);
+		final Job newJob = jobService.createJobFromJobRequest(jobRequest);
+		final Future<Job> jobResult = jobExecutor.runJob(newJob);
 
-		return new JobResponseImpl(job.getJobID(), 200,
-				"A job has been created successfully.");
+		final Job completedJob = jobResult.get();
+
+		final String jobID = completedJob.getJobID();
+		final String mimeType = completedJob.getJobRequest().getMimeType();
+
+		final int graphSize = completedJob.getResultGraph().size();
+
+		final StreamingOutput streamingOutput = new StreamingOutput() {
+
+			@Override
+			public void write(final OutputStream outputStream)
+					throws IOException, WebApplicationException {
+
+				final Serializer serializer = ((BundleAwareApplication) application)
+						.getService(Serializer.class);
+
+				logger.debug("Got a Serializer [ {} ].", serializer);
+
+				logger.debug("Found a job [ {} ][ jobID :: {} ].",
+						new Object[] { completedJob, jobID });
+
+				final MGraph graph = completedJob.getResultGraph();
+
+				// final ByteArrayOutputStream outputStream = new
+				// ByteArrayOutputStream();
+				serializer.serialize(outputStream, graph, mimeType);
+
+			}
+		};
+
+		return Response.ok().type(mimeType)
+				.header("Data-Processing-Units-Cost", graphSize)
+				.entity(streamingOutput).build();
 	}
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
