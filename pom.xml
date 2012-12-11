@@ -26,10 +26,18 @@
 		<stanbol-data-version>1.0.5-SNAPSHOT</stanbol-data-version>
 		<stanbol-enhancer-version>0.10.0-SNAPSHOT</stanbol-enhancer-version>
 		<stanbol-entityhub-version>0.11.0-SNAPSHOT</stanbol-entityhub-version>
+		<stanbol-facade-version>1.0.2-SNAPSHOT</stanbol-facade-version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>io.insideout</groupId>
+				<artifactId>stanbol-facade-api</artifactId>
+				<version>${stanbol-facade-version}</version>
+				<scope>compile</scope>
+			</dependency>
+
 			<dependency>
 				<groupId>org.apache.stanbol</groupId>
 				<artifactId>org.apache.stanbol.commons.web.base</artifactId>
@@ -173,7 +181,7 @@
 		<module>freeling-engine</module>
 		<module>freebase-engine</module>
 		<module>schemaorg-engine</module>
-		<module>wordlift-webfragment</module>
+		<!-- module>wordlift-webfragment</module -->
 		<module>wordlift-webapi</module>
 		<module>textannotations-futuremodel</module>
 	</modules>

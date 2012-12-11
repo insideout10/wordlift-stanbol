@@ -31,6 +31,7 @@
 						<Import-Package>
 							io.insideout.wordlift.org.apache.stanbol.services;version=${project.version},
 							io.insideout.wordlift.org.apache.stanbol.domain;version=${project.version},
+							io.insideout.stanbol.facade.models;version=${stanbol-facade-version},
 							org.apache.stanbol.*,
 							org.apache.clerezza.*,
 							org.apache.commons.*,
@@ -59,6 +60,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.insideout</groupId>
+			<artifactId>stanbol-facade-api</artifactId>
+		</dependency>
+
 		<!-- ##### W O R D L I F T ##### -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
