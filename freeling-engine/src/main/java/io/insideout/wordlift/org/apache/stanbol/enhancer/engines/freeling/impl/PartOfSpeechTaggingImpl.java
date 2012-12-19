@@ -133,7 +133,7 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 		for (String language : freelingLanguages) {
 			try {
 				languageAnalyzers.put(language,
-						analyzerFactory.create(language, 10));
+						analyzerFactory.create(language, 5));
 			} catch (InterruptedException e) {
 				logger.error("Something went bad.", e);
 			} catch (ExecutionException e) {
