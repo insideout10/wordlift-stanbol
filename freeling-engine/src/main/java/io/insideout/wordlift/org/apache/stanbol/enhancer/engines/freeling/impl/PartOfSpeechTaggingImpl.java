@@ -1,14 +1,17 @@
 package io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.impl;
 
 import io.insideout.wordlift.org.apache.stanbol.domain.Noun;
+import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.Analyzer;
+import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.AnalyzerFactory;
 import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.PartOfSpeechTagging;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
@@ -19,19 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.upc.freeling.Analysis;
-import edu.upc.freeling.ChartParser;
-import edu.upc.freeling.DepTxala;
-import edu.upc.freeling.HmmTagger;
 import edu.upc.freeling.ListSentence;
 import edu.upc.freeling.ListWord;
-import edu.upc.freeling.Maco;
-import edu.upc.freeling.MacoOptions;
-import edu.upc.freeling.Nec;
-import edu.upc.freeling.Senses;
 import edu.upc.freeling.Sentence;
-import edu.upc.freeling.Splitter;
-import edu.upc.freeling.Tokenizer;
-import edu.upc.freeling.UkbWrap;
 import edu.upc.freeling.Util;
 import edu.upc.freeling.Word;
 
@@ -53,6 +46,8 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 	@Property(value = { "as", "ca", "cy", "en", "es", "gl", "it", "pt", "ru" })
 	private final static String FREELING_CONFIGURATION_LANGUAGES = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.languages";
 
+	private final static int MAX_THREADS = 50;
+
 	// the Freeling library share path.
 	private String freelingSharePath;
 
@@ -73,7 +68,10 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 
 	// a Map of Freeling Analisys configurations, the key being a 2-letters
 	// language code.
-	private Map<String, FreelingAnalysis> freelingModules = new HashMap<String, FreelingAnalysis>();
+	// private Map<String, FreelingAnalysis> freelingModules = new
+	// HashMap<String, FreelingAnalysis>();
+
+	private final Map<String, LinkedList<Analyzer>> languageAnalyzers = new HashMap<String, LinkedList<Analyzer>>();
 
 	/**
 	 * Empty constructor for OSGi support.
@@ -108,6 +106,8 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 	 * 
 	 * @param properties
 	 *            A map of configuration properties.
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
 	@Activate
 	private void activate(Map<String, Object> properties) {
@@ -125,238 +125,20 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 		// initialize the locale (usually 'default').
 		Util.initLocale(freelingLocale);
 
+		final AnalyzerFactory analyzerFactory = new AnalyzerFactory(
+				configurationPath, configurationFilenameSuffix,
+				freelingSharePath, MAX_THREADS);
+
 		// load the configuration for each of the configured languages.
-		for (String language : freelingLanguages)
-			loadConfigurationForLanguage(language);
-	}
-
-	/**
-	 * Loads the configuration for the provided language by locating the
-	 * configuration file and parsing its contents.
-	 * 
-	 * @param language
-	 *            A two-letters language code.
-	 */
-	private void loadConfigurationForLanguage(String language) {
-		String propertiesFilePath = String.format("%s/%s%s", configurationPath,
-				language, configurationFilenameSuffix);
-
-		logger.info("Reading properties from configuration file [{}]",
-				propertiesFilePath);
-
-		FreelingProperties properties = new FreelingProperties(
-				propertiesFilePath, freelingSharePath);
-
-		logger.info("Setting language [{}].", properties.getLanguage());
-
-		MacoOptions macoOptions = new MacoOptions(properties.getLanguage());
-		logger.info(
-				"Setting MACO options [{}][{}][{}][{}][{}][{}][{}][{}][{}][{}][{}].",
-				new Object[] { false, properties.isAffixAnalysis(),
-						properties.isMultiwordsDetection(),
-						properties.isNumbersDetection(),
-						properties.isPunctuationDetection(),
-						properties.isDatesDetection(),
-						properties.isQuantitiesDetection(),
-						properties.isDictionarySearch(),
-						properties.isProbabilityAssignment(),
-						properties.isNeRecognition(),
-						properties.isOrtographicCorrection() });
-		macoOptions.setActiveModules(false, properties.isAffixAnalysis(),
-				properties.isMultiwordsDetection(),
-				properties.isNumbersDetection(),
-				properties.isPunctuationDetection(),
-				properties.isDatesDetection(),
-				properties.isQuantitiesDetection(),
-				properties.isDictionarySearch(),
-				properties.isProbabilityAssignment(),
-				properties.isNeRecognition(),
-				properties.isOrtographicCorrection());
-
-		logger.info(
-				"Setting MACO data files [{}][{}][{}][{}][{}][{}][{}][{}][{}].",
-				new Object[] { "", properties.getLocutionsFile(),
-						properties.getQuantitiesFile(),
-						properties.getAffixFile(),
-						properties.getProbabilityFile(),
-						properties.getDictionaryFile(),
-						properties.getNpDataFile(),
-						properties.getPunctuationFile(),
-						properties.getCorrectorFile() });
-		macoOptions.setDataFiles("", properties.getLocutionsFile(),
-				properties.getQuantitiesFile(), properties.getAffixFile(),
-				properties.getProbabilityFile(),
-				properties.getDictionaryFile(), properties.getNpDataFile(),
-				properties.getPunctuationFile(), properties.getCorrectorFile());
-
-		logger.info("Creating the tokenizer [{}].",
-				properties.getTokenizerFile());
-		// Create analyzers.
-		Tokenizer tokenizer = new Tokenizer(properties.getTokenizerFile());
-
-		logger.info("Creating the splitter [{}].", properties.getSplitterFile());
-		Splitter splitter = new Splitter(properties.getSplitterFile());
-
-		logger.info("Creating the MACO analyzer.");
-		Maco maco = new Maco(macoOptions);
-
-		logger.info("Creating the tagger.");
-		HmmTagger hmmTagger = new HmmTagger(properties.getLanguage(),
-				properties.getTaggerHMMFile(), properties.isTaggerRetokenize(),
-				properties.getTaggerForceSelect());
-
-		ChartParser chartParser = null;
-		File grammarFile = new File(properties.getGrammarFile());
-		if (grammarFile.exists() && !grammarFile.isDirectory()) {
-			logger.info("Creating the chart parser.");
-			chartParser = new ChartParser(properties.getGrammarFile());
-		}
-
-		DepTxala depTxala = null;
-		File depTxalaFile = new File(properties.getDepTxalaFile());
-		if (null != chartParser && depTxalaFile.exists()
-				&& !depTxalaFile.isDirectory()) {
-			logger.info("Creating the dependencies analyzer.");
-			depTxala = new DepTxala(properties.getDepTxalaFile(),
-					chartParser.getStartSymbol());
-		}
-
-		Nec nec = null;
-		if (properties.isNeClassification()) {
-			File necFile = new File(properties.getNecFile());
-			if (necFile.exists() && !necFile.isDirectory()) {
-				logger.info("Creating the named entity classification.");
-				nec = new Nec(properties.getNecFile());
+		for (String language : freelingLanguages) {
+			try {
+				languageAnalyzers.put(language,
+						analyzerFactory.create(language, 10));
+			} catch (InterruptedException e) {
+				logger.error("Something went bad.", e);
+			} catch (ExecutionException e) {
+				logger.error("Something went bad.", e);
 			}
-		}
-
-		// Instead of "UkbWrap", you can use a "Senses" object, that simply
-		// gives all possible WN senses, sorted by frequency.
-		Senses senses = null;
-		File senseConfigFile = new File(properties.getSenseConfigFile());
-		if (senseConfigFile.exists() && senseConfigFile.isFile()) {
-			logger.info("Creating the senses tool.");
-			senses = new Senses(properties.getSenseConfigFile());
-		}
-
-		UkbWrap ukbWrap = null;
-		File ukbConfigFile = new File(properties.getUkbConfigFile());
-		if (ukbConfigFile.exists() && ukbConfigFile.isFile()) {
-			logger.info("Creating the disambiguation tool.");
-			ukbWrap = new UkbWrap(properties.getUkbConfigFile());
-		}
-
-		FreelingAnalysis analysis = new FreelingAnalysis();
-		analysis.setMaco(maco);
-		analysis.setTokenizer(tokenizer);
-		analysis.setSplitter(splitter);
-		analysis.setHmmTagger(hmmTagger);
-		analysis.setChartParser(chartParser);
-		analysis.setDepTxala(depTxala);
-		analysis.setNec(nec);
-		analysis.setSenses(senses);
-		analysis.setUkbWrap(ukbWrap);
-		analysis.setAlwaysFlush(properties.isAlwaysFlush());
-
-		freelingModules.put(language, analysis);
-
-	}
-
-	/**
-	 * A class that maps Freeling configurations.
-	 * 
-	 * @author David Riccitelli
-	 */
-	private class FreelingAnalysis {
-		private Maco maco;
-		private Tokenizer tokenizer;
-		private Splitter splitter;
-		private HmmTagger hmmTagger;
-		private ChartParser chartParser;
-		private DepTxala depTxala;
-		private Nec nec;
-		private Senses senses;
-		private UkbWrap ukbWrap;
-		private boolean alwaysFlush;
-
-		public Maco getMaco() {
-			return maco;
-		}
-
-		public void setMaco(Maco maco) {
-			this.maco = maco;
-		}
-
-		public Tokenizer getTokenizer() {
-			return tokenizer;
-		}
-
-		public void setTokenizer(Tokenizer tokenizer) {
-			this.tokenizer = tokenizer;
-		}
-
-		public Splitter getSplitter() {
-			return splitter;
-		}
-
-		public void setSplitter(Splitter splitter) {
-			this.splitter = splitter;
-		}
-
-		public HmmTagger getHmmTagger() {
-			return hmmTagger;
-		}
-
-		public void setHmmTagger(HmmTagger hmmTagger) {
-			this.hmmTagger = hmmTagger;
-		}
-
-		public ChartParser getChartParser() {
-			return chartParser;
-		}
-
-		public void setChartParser(ChartParser chartParser) {
-			this.chartParser = chartParser;
-		}
-
-		public DepTxala getDepTxala() {
-			return depTxala;
-		}
-
-		public void setDepTxala(DepTxala depTxala) {
-			this.depTxala = depTxala;
-		}
-
-		public Nec getNec() {
-			return nec;
-		}
-
-		public void setNec(Nec nec) {
-			this.nec = nec;
-		}
-
-		public Senses getSenses() {
-			return senses;
-		}
-
-		public void setSenses(Senses senses) {
-			this.senses = senses;
-		}
-
-		public UkbWrap getUkbWrap() {
-			return ukbWrap;
-		}
-
-		public void setUkbWrap(UkbWrap ukbWrap) {
-			this.ukbWrap = ukbWrap;
-		}
-
-		public boolean isAlwaysFlush() {
-			return alwaysFlush;
-		}
-
-		public void setAlwaysFlush(boolean alwaysFlush) {
-			this.alwaysFlush = alwaysFlush;
 		}
 
 	}
@@ -364,8 +146,25 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 	/**
 	 * Get a set of nouns by analysing the text of the specified language.
 	 */
-	public Set<Noun> getNouns(String language, String text) {
-		return getNouns(freelingModules.get(language), text);
+	public Set<Noun> getNouns(final String language, final String text) {
+
+		final LinkedList<Analyzer> analyzers = languageAnalyzers.get(language);
+		Analyzer analyzer;
+
+		while (null == (analyzer = analyzers.pollFirst()))
+			try {
+				logger.trace("Waiting for an analyzer [ language :: {} ].",
+						language);
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				logger.error("Something went bad.", e);
+			}
+
+		final Set<Noun> nouns = getNouns(analyzer, text);
+
+		analyzers.addLast(analyzer);
+
+		return nouns;
 	}
 
 	/**
@@ -378,8 +177,7 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 	 *            The text to analyse.
 	 * @return A set of nouns.
 	 */
-	private Set<Noun> getNouns(final FreelingAnalysis analysis,
-			final String text) {
+	private Set<Noun> getNouns(final Analyzer analysis, final String text) {
 
 		logger.trace("Analyzing text [ text :: {} ]...", text);
 

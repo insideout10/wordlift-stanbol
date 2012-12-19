@@ -11,38 +11,41 @@ import org.slf4j.LoggerFactory;
 
 public class TestPartOfSpeechTagging {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final String freelingSharePath = "/usr/local/Cellar/freeling/HEAD/share/freeling";
-    private final String configurationPath = "/usr/local/Cellar/freeling/HEAD/share/freeling/config";
-    private final String configurationFilenameSuffix = ".cfg";
-    private final String[] languages = {"as", "ca", "cy", "en", "es", "gl", "it", "pt", "ru"};
+	private final String freelingSharePath = "/usr/local/Cellar/freeling/HEAD/share/freeling";
+	private final String configurationPath = "/usr/local/Cellar/freeling/HEAD/share/freeling/config";
+	private final String configurationFilenameSuffix = ".cfg";
+	private final String[] languages = { "as", "ca", "cy", "en", "es", "gl",
+			"it", "pt", "ru" };
 
-    PartOfSpeechTaggingImpl partOfSpeechTagging;
+	PartOfSpeechTaggingImpl partOfSpeechTagging;
 
-    @Test
-    public void test() {
+	@Test
+	public void test() {
 
-        System.load("/usr/local/lib/libfreeling_javaAPI.so");
+		System.load("/Users/david/Developer/freeling/home/bin/libfreeling_javaAPI.so");
 
-        partOfSpeechTagging = new PartOfSpeechTaggingImpl(freelingSharePath, configurationPath,
-                configurationFilenameSuffix, languages);
+		partOfSpeechTagging = new PartOfSpeechTaggingImpl(freelingSharePath,
+				configurationPath, configurationFilenameSuffix, languages);
 
-        for (String language : languages)
-            testLanguage(language);
-    }
+		for (String language : languages)
+			testLanguage(language);
+	}
 
-    private void testLanguage(String language) {
+	private void testLanguage(String language) {
 
-        String text = TestUtils.getText(String.format("/%s.txt", language));
+		String text = TestUtils.getText(String.format("/%s.txt", language));
 
-        if (null == text || text.isEmpty()) return;
+		if (null == text || text.isEmpty())
+			return;
 
-        System.out.println(String.format("Analyzing language [%s]", language));
+		System.out.println(String.format("Analyzing language [%s]", language));
 
-        Set<Noun> nouns = partOfSpeechTagging.getNouns(language, text);
+		Set<Noun> nouns = partOfSpeechTagging.getNouns(language, text);
 
-        System.out.println(String.format("Got %n noun(s) for language [%s]", nouns.size(), language));
+		System.out.println(String.format("Got %n noun(s) for language [%s]",
+				nouns.size(), language));
 
-    }
+	}
 }
