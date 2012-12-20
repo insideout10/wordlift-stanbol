@@ -6,6 +6,7 @@ import java.util.Collection;
 
 public interface FreebaseEntityRecognition {
 
-    public Collection<FreebaseResult> extractEntities(String query, String language);
+	public Collection<FreebaseResult> extractEntities(String query,
+			String language, double minScore, int freebaseSearchLimit);
 
 }

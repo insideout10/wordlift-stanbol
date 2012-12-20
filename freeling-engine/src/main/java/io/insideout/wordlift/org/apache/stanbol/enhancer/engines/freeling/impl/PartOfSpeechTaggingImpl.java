@@ -182,7 +182,7 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 		logger.trace("Analyzing text [ text :: {} ]...", text);
 
 		// Extract the tokens from the line of text.
-		final ListWord listWord = analysis.getTokenizer().tokenize(text);
+		final ListWord listWord = analysis.getTokenizer().tokenize(text + "\n.\n");
 
 		logger.trace(
 				"Got the list of words using the tokenizer [ word # :: {} ].",

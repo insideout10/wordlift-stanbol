@@ -16,108 +16,123 @@ import org.slf4j.LoggerFactory;
 
 public class FreebaseEntityRecognitionRunnable implements Runnable {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private TextAnnotation textAnnotation;
-    private Site site;
-    private FreebaseEntityRecognition freebaseEntityRecognition;
-    private ContentItem contentItem;
-    private String defaultLanguage;
-    private String freebaseURI;
-    private FreebaseEntityRecognitionEngine entityRecognitionEngine;
-    private double minimumScore;
+	private TextAnnotation textAnnotation;
+	private Site site;
+	private FreebaseEntityRecognition freebaseEntityRecognition;
+	private ContentItem contentItem;
+	private String defaultLanguage;
+	private String freebaseURI;
+	private FreebaseEntityRecognitionEngine entityRecognitionEngine;
+	private double entityMinimumScore;
+	private double freebaseSearchMinimumScore;
+	private int freebaseSearchLimit;
 
-    public FreebaseEntityRecognitionRunnable(TextAnnotation textAnnotation,
-                                             Site site,
-                                             FreebaseEntityRecognition freebaseEntityRecognition,
-                                             ContentItem contentItem,
-                                             String defaultLanguage,
-                                             String freebaseURI,
-                                             FreebaseEntityRecognitionEngine entityRecognitionEngine,
-                                             double minimumScore) {
-        this.textAnnotation = textAnnotation;
-        this.site = site;
-        this.freebaseEntityRecognition = freebaseEntityRecognition;
-        this.contentItem = contentItem;
-        this.defaultLanguage = defaultLanguage;
-        this.freebaseURI = freebaseURI;
-        this.entityRecognitionEngine = entityRecognitionEngine;
-        this.minimumScore = minimumScore;
-    }
+	public FreebaseEntityRecognitionRunnable(TextAnnotation textAnnotation,
+			Site site, FreebaseEntityRecognition freebaseEntityRecognition,
+			ContentItem contentItem, String defaultLanguage,
+			String freebaseURI,
+			FreebaseEntityRecognitionEngine entityRecognitionEngine,
+			double minimumScore, double freebaseSearchMinimumScore,
+			int freebaseSearchLimit) {
+		this.textAnnotation = textAnnotation;
+		this.site = site;
+		this.freebaseEntityRecognition = freebaseEntityRecognition;
+		this.contentItem = contentItem;
+		this.defaultLanguage = defaultLanguage;
+		this.freebaseURI = freebaseURI;
+		this.entityRecognitionEngine = entityRecognitionEngine;
+		this.entityMinimumScore = minimumScore;
+		this.freebaseSearchMinimumScore = freebaseSearchMinimumScore;
+		this.freebaseSearchLimit = freebaseSearchLimit;
+	}
 
-    @Override
-    public void run() {
+	@Override
+	public void run() {
 
-        String text = textAnnotation.getText();
-        String language = (textAnnotation.getLanguageTwoLetterCode().isEmpty() ? defaultLanguage
-                : textAnnotation.getLanguageTwoLetterCode());
+		String text = textAnnotation.getText();
+		String language = (textAnnotation.getLanguageTwoLetterCode().isEmpty() ? defaultLanguage
+				: textAnnotation.getLanguageTwoLetterCode());
 
-        logger.trace("Running new search thread [text :: {}][language :: {}].", text, language);
+		logger.trace("Running new search thread [text :: {}][language :: {}].",
+				text, language);
 
-        // -- CUT --
+		// -- CUT --
 
-        // perform the actual search.
-        Collection<FreebaseResult> results = freebaseEntityRecognition.extractEntities(text, language);
+		// perform the actual search.
+		Collection<FreebaseResult> results = freebaseEntityRecognition
+				.extractEntities(text, language, freebaseSearchMinimumScore,
+						freebaseSearchLimit);
 
-        // continue to the next search if there are no results.
-        if (null == results) return;
+		// continue to the next search if there are no results.
+		if (null == results)
+			return;
 
-        double maxScore = getMaxScore(results);
+		double maxScore = getMaxScore(results);
 
-        for (FreebaseResult result : results) {
-            String sameAsReference = freebaseURI + result.getMid().replace("/m/", "/m.");
+		for (FreebaseResult result : results) {
+			String sameAsReference = freebaseURI
+					+ result.getMid().replace("/m/", "/m.");
 
-            // // ##### E N T I T Y H U B Q U E R Y I N G #####
-            // FieldQuery fieldQuery = entityHub.getQueryFactory().createFieldQuery();
-            //
-            // setFieldQueryParameters(fieldQuery, sameAsReference, language);
-            //
-            // QueryResultList<Entity> entities = null;
-            // try {
-            // entities = entityHub.findEntities(fieldQuery);
-            // logger.trace("Found [{}] entities via the EntityHub for [{}].",
-            // new Object[] {entities.size(), sameAsReference});
-            // } catch (EntityhubException e) {
-            // logger.error(
-            // "An Entity Hub exception occured [{}] while looking for entities for [{}]:\n{}",
-            // new Object[] {e.getClass(), sameAsReference, e.getMessage()}, e);
-            // } catch (NullPointerException e) {
-            // logger.error(
-            // "An Entity Hub exception occured [{}] while looking for entities for [{}]:\n{}",
-            // new Object[] {e.getClass(), sameAsReference, e.getMessage()}, e);
-            // }
+			// // ##### E N T I T Y H U B Q U E R Y I N G #####
+			// FieldQuery fieldQuery =
+			// entityHub.getQueryFactory().createFieldQuery();
+			//
+			// setFieldQueryParameters(fieldQuery, sameAsReference, language);
+			//
+			// QueryResultList<Entity> entities = null;
+			// try {
+			// entities = entityHub.findEntities(fieldQuery);
+			// logger.trace("Found [{}] entities via the EntityHub for [{}].",
+			// new Object[] {entities.size(), sameAsReference});
+			// } catch (EntityhubException e) {
+			// logger.error(
+			// "An Entity Hub exception occured [{}] while looking for entities for [{}]:\n{}",
+			// new Object[] {e.getClass(), sameAsReference, e.getMessage()}, e);
+			// } catch (NullPointerException e) {
+			// logger.error(
+			// "An Entity Hub exception occured [{}] while looking for entities for [{}]:\n{}",
+			// new Object[] {e.getClass(), sameAsReference, e.getMessage()}, e);
+			// }
 
-            FieldQuery fieldQuery = site.getQueryFactory().createFieldQuery();
+			FieldQuery fieldQuery = site.getQueryFactory().createFieldQuery();
 
-            entityRecognitionEngine.setFieldQueryParameters(fieldQuery, sameAsReference, language);
+			entityRecognitionEngine.setFieldQueryParameters(fieldQuery,
+					sameAsReference, language);
 
-            QueryResultList<Entity> entities = null;
-            try {
-                entities = site.findEntities(fieldQuery);
-            } catch (SiteException e) {
-                logger.error("An Site exception occured [{}] while looking for entities for [{}]:\n{}",
-                    new Object[] {e.getClass(), sameAsReference, e.getMessage()}, e);
+			QueryResultList<Entity> entities = null;
+			try {
+				entities = site.findEntities(fieldQuery);
+			} catch (SiteException e) {
+				logger.error(
+						"An Site exception occured [{}] while looking for entities for [{}]:\n{}",
+						new Object[] { e.getClass(), sameAsReference,
+								e.getMessage() }, e);
 
-                //
-                continue;
-            }
+				//
+				continue;
+			}
 
-            logger.trace("Found [{}] entities via the Site for [{}].", new Object[] {entities.size(),
-                                                                                     sameAsReference});
-            double score = result.getScore() / maxScore;
+			logger.trace("Found [{}] entities via the Site for [{}].",
+					new Object[] { entities.size(), sameAsReference });
+			double score = result.getScore() / maxScore;
 
-            if (score < minimumScore) continue;
-            
-            entityRecognitionEngine.writeEntities(contentItem, entities, language, textAnnotation, score);
-        }
+			if (score < entityMinimumScore)
+				continue;
 
-    }
+			entityRecognitionEngine.writeEntities(contentItem, entities,
+					language, textAnnotation, score);
+		}
 
-    private double getMaxScore(Collection<FreebaseResult> results) {
-        double maxScore = 0.0;
-        for (FreebaseResult result : results)
-            if (maxScore < result.getScore()) maxScore = result.getScore();
+	}
 
-        return maxScore;
-    }
+	private double getMaxScore(Collection<FreebaseResult> results) {
+		double maxScore = 0.0;
+		for (FreebaseResult result : results)
+			if (maxScore < result.getScore())
+				maxScore = result.getScore();
+
+		return maxScore;
+	}
 }

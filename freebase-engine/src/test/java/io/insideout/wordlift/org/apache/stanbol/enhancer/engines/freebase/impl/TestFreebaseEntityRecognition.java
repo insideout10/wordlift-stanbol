@@ -17,71 +17,82 @@ import org.slf4j.LoggerFactory;
 
 public class TestFreebaseEntityRecognition {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Test
-    public void test() {
+	private final static double FREEBASE_SEARCH_MINIMUM_SCORE = 1D;
 
-        Map<String,String> queries = new HashMap<String,String>();
-        queries.put("Campionato del Mondo MotoGP", "it");
-        // queries.put("Borgo Panigale", "it");
-        // queries.put("Siena", "it");
-        // queries.put("FIPSAS", "it");
-        // queries.put("Toscana", "it");
-        // queries.put("Enel", "it");
-        // queries.put("Federazione Italiana Pesca Sportiva", "it");
-        // queries.put("Attività Subacquee", "it");
-        // queries.put("Confindustria", "it");
-        // queries.put("Monte Amiata", "it");
+	@Test
+	public void test() {
 
-        for (Entry<String,String> query : queries.entrySet())
-            testEntityRecognition(query.getKey(), query.getValue());
-    }
+		Map<String, String> queries = new HashMap<String, String>();
+		queries.put("Campionato del Mondo MotoGP", "it");
+		// queries.put("Borgo Panigale", "it");
+		// queries.put("Siena", "it");
+		// queries.put("FIPSAS", "it");
+		// queries.put("Toscana", "it");
+		// queries.put("Enel", "it");
+		// queries.put("Federazione Italiana Pesca Sportiva", "it");
+		// queries.put("Attività Subacquee", "it");
+		// queries.put("Confindustria", "it");
+		// queries.put("Monte Amiata", "it");
 
-    private void testEntityRecognition(String query, String language) {
+		for (Entry<String, String> query : queries.entrySet())
+			testEntityRecognition(query.getKey(), query.getValue());
+	}
 
-        Properties properties = getProperties();
+	private void testEntityRecognition(String query, String language) {
 
-        String key = properties.getProperty("freebase.key", "");
-        int limit = Integer.parseInt(properties.getProperty("freebase.search.limit", "3"));
-        boolean indent = Boolean.parseBoolean(properties.getProperty("freebase.search.indent", "true"));
-        double minScore = Double.parseDouble(properties.getProperty("freebase.search.score.minimum", "1.0"));
+		Properties properties = getProperties();
 
-        FreebaseEntityRecognitionImpl entityRecognition = new FreebaseEntityRecognitionImpl(key, limit,
-                indent, minScore);
+		String key = properties.getProperty("freebase.key", "");
+		int limit = Integer.parseInt(properties.getProperty(
+				"freebase.search.limit", "3"));
+		boolean indent = Boolean.parseBoolean(properties.getProperty(
+				"freebase.search.indent", "true"));
+		double minScore = Double.parseDouble(properties.getProperty(
+				"freebase.search.score.minimum", "1.0"));
 
-        logger.info("Searching for [{}@{}].", new Object[] {query, language});
+		FreebaseEntityRecognitionImpl entityRecognition = new FreebaseEntityRecognitionImpl(
+				key, limit, indent);
 
-        Collection<FreebaseResult> results = entityRecognition.extractEntities(query, language);
+		logger.info("Searching for [{}@{}].", new Object[] { query, language });
 
-        for (FreebaseResult result : results) {
+		Collection<FreebaseResult> results = entityRecognition.extractEntities(
+				query, language, FREEBASE_SEARCH_MINIMUM_SCORE);
 
-            String url = "http://rdf.freebase.com/ns" + result.getMid().replace("/m/", "/m.");
-            logger.info(
-                "[{}@{}][score :: {}][mid :: {}][url :: {} ]",
-                new Object[] {(null != result.getName() ? result.getName() : result.getId()),
-                              result.getLanguage(), result.getScore(), result.getMid(), url});
-        }
-    }
+		for (FreebaseResult result : results) {
 
-    private Properties getProperties() {
+			String url = "http://rdf.freebase.com/ns"
+					+ result.getMid().replace("/m/", "/m.");
+			logger.info("[{}@{}][score :: {}][mid :: {}][url :: {} ]",
+					new Object[] {
+							(null != result.getName() ? result.getName()
+									: result.getId()), result.getLanguage(),
+							result.getScore(), result.getMid(), url });
+		}
+	}
 
-        Properties properties = new Properties();
+	private Properties getProperties() {
 
-        InputStream inputStream = getClass().getResourceAsStream("/freebase.configuration");
-        if (null == inputStream) fail("A configuration file \"freebase.configuration\" is required in the \"/src/test/resources\" folder with Freebase configuration data.");
+		Properties properties = new Properties();
 
-        try {
-            properties.load(inputStream);
-        } catch (IOException e) {
-            fail("An error occured file reading from the configuration file.");
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {}
-        }
+		InputStream inputStream = getClass().getResourceAsStream(
+				"/freebase.configuration");
+		if (null == inputStream)
+			fail("A configuration file \"freebase.configuration\" is required in the \"/src/test/resources\" folder with Freebase configuration data.");
 
-        return properties;
+		try {
+			properties.load(inputStream);
+		} catch (IOException e) {
+			fail("An error occured file reading from the configuration file.");
+		} finally {
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+			}
+		}
 
-    }
+		return properties;
+
+	}
 }

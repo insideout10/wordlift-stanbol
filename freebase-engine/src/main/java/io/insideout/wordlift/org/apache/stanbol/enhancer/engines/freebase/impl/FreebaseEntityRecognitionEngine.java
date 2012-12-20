@@ -80,12 +80,22 @@ public class FreebaseEntityRecognitionEngine extends
 
 	public static final Integer defaultOrder = ORDERING_EXTRACTION_ENHANCEMENT;
 
-	private final static String MINIMUM_SCORE_PARAM_NAME = "freebase.entity-recognition.score.minimum";
+	@Property(doubleValue = 1.0)
+	private final static String FREEBASE_SEARCH_MINIMUM_SCORE_DEFAULT_VALUE = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freebase.search.score.minimum";
+
+	@Property(intValue = 3)
+	private final static String FREEBASE_SEARCH_LIMIT_DEFAULT_VALUE = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freebase.search.limit";
+
+	private final static String FREEBASE_SEARCH_MINIMUM_SCORE_PARAM_NAME = "freebase.entity-recognition.search.score.minimum";
+	private final static String ENTITY_MINIMUM_SCORE_PARAM_NAME = "freebase.entity-recognition.entity.score.minimum";
+	private final static String FREEBASE_SEARCH_LIMIT_PARAM_NAME = "freebase.entity-recognition.search.limit";
 
 	private String freebaseURI;
 	private int maxConcurrentSearchThreads;
 	private long searchTimeoutSeconds;
 	private double minimumScore;
+	private double defaultFreebaseSearchMinimumScore;
+	private int defaultFreebaseSearchLimit;
 
 	// holds the site bound to this engine. it gets initialized in the Activate
 	// method, using the siteName
@@ -132,6 +142,10 @@ public class FreebaseEntityRecognitionEngine extends
 		searchTimeoutSeconds = (Long) properties.get(SEARCH_TIMEOUT_SECONDS);
 		freebaseURI = (String) properties.get(FREEBASE_RDF_URI);
 		minimumScore = (Double) properties.get(MINIMUM_SCORE);
+		defaultFreebaseSearchMinimumScore = (Double) properties
+				.get(FREEBASE_SEARCH_MINIMUM_SCORE_DEFAULT_VALUE);
+		defaultFreebaseSearchLimit = (Integer) properties
+				.get(FREEBASE_SEARCH_LIMIT_DEFAULT_VALUE);
 
 		site = siteManager.getSite(siteName);
 
@@ -172,6 +186,8 @@ public class FreebaseEntityRecognitionEngine extends
 
 		// set the default minimum score.
 		Double minimumScore = this.minimumScore;
+		Double freebaseSearchMinimumScore = this.defaultFreebaseSearchMinimumScore;
+		Integer freebaseSearchLimit = this.defaultFreebaseSearchLimit;
 
 		// check if there are configuration information in this contentItem.
 		if (contentItem instanceof ContentItemBag) {
@@ -180,14 +196,42 @@ public class FreebaseEntityRecognitionEngine extends
 					.getConfiguration();
 
 			// set the minimum score to the one requested in this call.
-			if (null != configuration && configuration.containsKey(MINIMUM_SCORE_PARAM_NAME)) {
+			if (null != configuration) {
 
-				minimumScore = Double.parseDouble(configuration
-						.get(MINIMUM_SCORE_PARAM_NAME));
+				if (configuration
+						.containsKey(FREEBASE_SEARCH_MINIMUM_SCORE_PARAM_NAME)) {
 
-				logger.trace(
-						"The minimum score for this call has been set to [ minimumScore :: {} ].",
-						minimumScore);
+					freebaseSearchMinimumScore = Double
+							.parseDouble(configuration
+									.get(FREEBASE_SEARCH_MINIMUM_SCORE_PARAM_NAME));
+
+					logger.trace(
+							"The minimum Freebase search score for this call has been set to [ {} :: {} ].",
+							FREEBASE_SEARCH_MINIMUM_SCORE_PARAM_NAME,
+							freebaseSearchMinimumScore);
+				}
+
+				if (configuration.containsKey(FREEBASE_SEARCH_LIMIT_PARAM_NAME)) {
+
+					freebaseSearchLimit = Integer
+							.parseInt(configuration
+									.get(FREEBASE_SEARCH_LIMIT_PARAM_NAME), 10);
+
+					logger.trace(
+							"The maximum number of results for this call has been set to [ {} :: {} ].",
+							FREEBASE_SEARCH_LIMIT_PARAM_NAME,
+							freebaseSearchLimit);
+				}
+
+				if (configuration.containsKey(ENTITY_MINIMUM_SCORE_PARAM_NAME)) {
+
+					minimumScore = Double.parseDouble(configuration
+							.get(ENTITY_MINIMUM_SCORE_PARAM_NAME));
+
+					logger.trace(
+							"The minimum entity score for this call has been set to [ {} :: {} ].",
+							ENTITY_MINIMUM_SCORE_PARAM_NAME, minimumScore);
+				}
 			}
 		}
 
@@ -203,7 +247,8 @@ public class FreebaseEntityRecognitionEngine extends
 			final Runnable entityRecognitionRunnable = new FreebaseEntityRecognitionRunnable(
 					textAnnotation, site, freebaseEntityRecognition,
 					contentItem, defaultLanguage, freebaseURI, this,
-					minimumScore);
+					minimumScore, freebaseSearchMinimumScore,
+					freebaseSearchLimit);
 			executor.execute(entityRecognitionRunnable);
 		}
 
