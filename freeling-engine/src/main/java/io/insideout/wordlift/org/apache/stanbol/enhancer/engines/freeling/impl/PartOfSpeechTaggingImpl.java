@@ -4,6 +4,7 @@ import io.insideout.wordlift.org.apache.stanbol.domain.Noun;
 import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.Analyzer;
 import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.AnalyzerFactory;
 import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.PartOfSpeechTagging;
+import io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.exceptions.TimeOutWaitingForAnalyzerException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +46,8 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 
 	@Property(value = { "as", "ca", "cy", "en", "es", "gl", "it", "pt", "ru" })
 	private final static String FREELING_CONFIGURATION_LANGUAGES = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.freeling.configuration.languages";
+
+	private final static int WAIT_ANALYZER_MAX_SECONDS = 30;
 
 	private final static int MAX_THREADS = 50;
 
@@ -150,19 +153,34 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 
 		final LinkedList<Analyzer> analyzers = languageAnalyzers.get(language);
 		Analyzer analyzer;
+		int waitAnalyzer = 0;
 
 		while (null == (analyzer = analyzers.pollFirst()))
 			try {
-				logger.trace("Waiting for an analyzer [ language :: {} ].",
-						language);
+				logger.trace(
+						"Waiting for an analyzer [ language :: {} ][ analyzers size :: {} ].",
+						language, analyzers.size());
 				Thread.sleep(1000);
+
+				if (waitAnalyzer++ > WAIT_ANALYZER_MAX_SECONDS)
+					throw new TimeOutWaitingForAnalyzerException(language,
+							WAIT_ANALYZER_MAX_SECONDS);
+
 			} catch (InterruptedException e) {
 				logger.error("Something went bad.", e);
+			} catch (TimeOutWaitingForAnalyzerException e) {
+				logger.error("Something went bad.", e);
+				return null;
 			}
 
-		final Set<Noun> nouns = getNouns(analyzer, text);
+		Set<Noun> nouns = null;
+		try {
+			nouns = getNouns(analyzer, text);
+		} catch (Exception e) {
 
-		analyzers.addLast(analyzer);
+		} finally {
+			analyzers.addLast(analyzer);
+		}
 
 		return nouns;
 	}
@@ -182,7 +200,8 @@ public class PartOfSpeechTaggingImpl implements PartOfSpeechTagging {
 		logger.trace("Analyzing text [ text :: {} ]...", text);
 
 		// Extract the tokens from the line of text.
-		final ListWord listWord = analysis.getTokenizer().tokenize(text + "\n.\n");
+		final ListWord listWord = analysis.getTokenizer().tokenize(
+				text + "\n.\n");
 
 		logger.trace(
 				"Got the list of words using the tokenizer [ word # :: {} ].",

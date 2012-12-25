@@ -20,6 +20,7 @@ public class TestFreebaseEntityRecognition {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final static double FREEBASE_SEARCH_MINIMUM_SCORE = 1D;
+	private final static int FREEBASE_SEARCH_LIMIT = 3;
 
 	@Test
 	public void test() {
@@ -58,7 +59,8 @@ public class TestFreebaseEntityRecognition {
 		logger.info("Searching for [{}@{}].", new Object[] { query, language });
 
 		Collection<FreebaseResult> results = entityRecognition.extractEntities(
-				query, language, FREEBASE_SEARCH_MINIMUM_SCORE);
+				query, language, FREEBASE_SEARCH_MINIMUM_SCORE,
+				FREEBASE_SEARCH_LIMIT);
 
 		for (FreebaseResult result : results) {
 
