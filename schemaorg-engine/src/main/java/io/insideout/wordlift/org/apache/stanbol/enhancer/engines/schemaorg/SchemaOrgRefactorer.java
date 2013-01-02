@@ -4,6 +4,7 @@ import com.hp.hpl.jena.graph.Graph;
 
 public interface SchemaOrgRefactorer {
 
-    public Graph processGraph(Graph graph, String languageTwoLetterCode);
+	public Graph processGraph(Graph graph, String languageTwoLetterCode,
+			Boolean filterLanguage);
 
 }

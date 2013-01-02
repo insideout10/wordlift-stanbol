@@ -272,26 +272,35 @@ public class FreebaseEntityRecognitionEngine extends
 		try {
 
 			for (Entity entity : entities) {
+				
 				// Now create the entityAnnotation
-				UriRef contentItemID = contentItem.getUri();
-				Representation representation = entity.getRepresentation();
-				UriRef entityAnnotation = EnhancementEngineHelper
+				final UriRef contentItemID = contentItem.getUri();
+				
+				final Representation representation = entity
+						.getRepresentation();
+				
+				final UriRef entityAnnotation = EnhancementEngineHelper
 						.createEntityEnhancement(graph, this, contentItemID);
 
-				Iterator<String> fieldNamesIterator = entity
+				final Iterator<String> fieldNamesIterator = entity
 						.getRepresentation().getFieldNames();
+
 				while (fieldNamesIterator.hasNext())
 					logger.trace("field name [{}].", fieldNamesIterator.next());
+
 				Text labelText = representation.getFirst(
 						"http://www.w3.org/2000/01/rdf-schema#label", language);
+				
 				if (null == labelText)
 					labelText = representation.getText(
 							"http://www.w3.org/2000/01/rdf-schema#label")
 							.next();
-				PlainLiteralImpl label = new PlainLiteralImpl(
+				
+				final PlainLiteralImpl label = new PlainLiteralImpl(
 						labelText.getText(), new Language(
 								labelText.getLanguage()));
-				UriRef entityURI = new UriRef(representation.getId());
+				
+				final UriRef entityURI = new UriRef(representation.getId());
 
 				// add the URI references to the Text Annotations.
 				graph.add(new TripleImpl(entityAnnotation, DC_RELATION,
@@ -303,8 +312,9 @@ public class FreebaseEntityRecognitionEngine extends
 				graph.add(new TripleImpl(entityAnnotation, ENHANCER_CONFIDENCE,
 						LiteralFactory.getInstance().createTypedLiteral(score)));
 
-				Iterator<org.apache.stanbol.entityhub.servicesapi.model.Reference> types = representation
+				final Iterator<org.apache.stanbol.entityhub.servicesapi.model.Reference> types = representation
 						.getReferences(RDF_TYPE.getUnicodeString());
+
 				while (types.hasNext()) {
 					graph.add(new TripleImpl(entityAnnotation,
 							ENHANCER_ENTITY_TYPE, new UriRef(types.next()

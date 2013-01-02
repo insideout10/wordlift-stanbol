@@ -35,197 +35,217 @@ import com.hp.hpl.jena.vocabulary.RDF;
 @Service
 public class SchemaOrgRefactorerImpl implements SchemaOrgRefactorer {
 
-    @Property(value = "custom-mappings.rdf")
-    private final static String CUSTOM_MAPPINGS_PATH = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.mappings.custom.path";
+	@Property(value = "custom-mappings.rdf")
+	private final static String CUSTOM_MAPPINGS_PATH = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.mappings.custom.path";
 
-    @Property(value = "custom-rules.rules")
-    private final static String CUSTOM_RULES_PATH = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.rules.custom.path";
+	@Property(value = "custom-rules.rules")
+	private final static String CUSTOM_RULES_PATH = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.rules.custom.path";
 
-    @Property(value = "dbpedia-mappings.rdf")
-    private final static String DBPEDIA_MAPPINGS_PATH = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.mappings.dbpedia.path";
+	@Property(value = "dbpedia-mappings.rdf")
+	private final static String DBPEDIA_MAPPINGS_PATH = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.mappings.dbpedia.path";
 
-    @Property(value = {"http://schema.org/Place", "http://schema.org/GeoCoordinates",
-                       "http://schema.org/Product", "http://schema.org/Person",
-                       "http://schema.org/Organization", "http://schema.org/Event",
-                       "http://schema.org/CreativeWork", "http://schema.org/MedicalEntity"})
-    private final static String TYPE_URIS = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.type.uri";
+	@Property(value = { "http://schema.org/Place",
+			"http://schema.org/GeoCoordinates", "http://schema.org/Product",
+			"http://schema.org/Person", "http://schema.org/Organization",
+			"http://schema.org/Event", "http://schema.org/CreativeWork",
+			"http://schema.org/MedicalEntity" })
+	private final static String TYPE_URIS = "io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg.type.uri";
 
-    private final static String[] DEFAULT_TYPE_URIS = {"http://schema.org/Place",
-                                                       "http://schema.org/GeoCoordinates",
-                                                       "http://schema.org/Product",
-                                                       "http://schema.org/Person",
-                                                       "http://schema.org/Organization",
-                                                       "http://schema.org/Event",
-                                                       "http://schema.org/CreativeWork",
-                                                       "http://schema.org/MedicalEntity"};
+	private final static String[] DEFAULT_TYPE_URIS = {
+			"http://schema.org/Place", "http://schema.org/GeoCoordinates",
+			"http://schema.org/Product", "http://schema.org/Person",
+			"http://schema.org/Organization", "http://schema.org/Event",
+			"http://schema.org/CreativeWork", "http://schema.org/MedicalEntity" };
 
-    private String customMappingsPath;
-    private String customRulesPath;
-    private String dbpediaMappingsPath;
-    private String[] typeURIs;
+	private String customMappingsPath;
+	private String customRulesPath;
+	private String dbpediaMappingsPath;
+	private String[] typeURIs;
 
-    private Reasoner rulesReasoner;
-    private Reasoner ontologyReasoner;
+	private Reasoner rulesReasoner;
+	private Reasoner ontologyReasoner;
 
-    private final static String TEXT_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/TextAnnotation";
-    private final static String ENTITY_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/EntityAnnotation";
+	private final static String TEXT_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/TextAnnotation";
+	private final static String ENTITY_ANNOTATION_URI_STRING = "http://fise.iks-project.eu/ontology/EntityAnnotation";
 
-    private final static Map<String,String> prefixes;
+	private final static Map<String, String> prefixes;
 
-    static {
-        prefixes = new HashMap<String,String>();
-        prefixes.put("sc", "http://schema.org/");
-        prefixes.put("sq", "http://stanbol.apache.org/ontology/entityhub/query#");
-    }
+	static {
+		prefixes = new HashMap<String, String>();
+		prefixes.put("sc", "http://schema.org/");
+		prefixes.put("sq",
+				"http://stanbol.apache.org/ontology/entityhub/query#");
+	}
 
-    // public SchemaOrgRefactorerImpl() {
-    // Map<String,Object> properties = new HashMap<String,Object>(3);
-    // properties.put(CUSTOM_MAPPINGS_PATH, DEFAULT_CUSTOM_MAPPINGS_PATH);
-    // properties.put(CUSTOM_RULES_PATH, DEFAULT_CUSTOM_RULES_PATH);
-    // properties.put(DBPEDIA_MAPPINGS_PATH, DEFAULT_DBPEDIA_MAPPINGS_PATH);
-    // activate(properties);
-    // }
+	// public SchemaOrgRefactorerImpl() {
+	// Map<String,Object> properties = new HashMap<String,Object>(3);
+	// properties.put(CUSTOM_MAPPINGS_PATH, DEFAULT_CUSTOM_MAPPINGS_PATH);
+	// properties.put(CUSTOM_RULES_PATH, DEFAULT_CUSTOM_RULES_PATH);
+	// properties.put(DBPEDIA_MAPPINGS_PATH, DEFAULT_DBPEDIA_MAPPINGS_PATH);
+	// activate(properties);
+	// }
 
-    /**
-     * Activates the SchemaOrgRefactorer instance.
-     * 
-     * @param properties
-     *            A map of properties for the refactorer.
-     */
-    @Activate
-    private void activate(Map<String,Object> properties) {
-        //
-        customMappingsPath = (String) properties.get(CUSTOM_MAPPINGS_PATH);
-        customRulesPath = (String) properties.get(CUSTOM_RULES_PATH);
-        dbpediaMappingsPath = (String) properties.get(DBPEDIA_MAPPINGS_PATH);
+	/**
+	 * Activates the SchemaOrgRefactorer instance.
+	 * 
+	 * @param properties
+	 *            A map of properties for the refactorer.
+	 */
+	@Activate
+	private void activate(Map<String, Object> properties) {
+		//
+		customMappingsPath = (String) properties.get(CUSTOM_MAPPINGS_PATH);
+		customRulesPath = (String) properties.get(CUSTOM_RULES_PATH);
+		dbpediaMappingsPath = (String) properties.get(DBPEDIA_MAPPINGS_PATH);
 
-        logger.info(
-            "The Schema.org Refactoring engine is being activated [ customMappingsPath :: {} ][ customRulesPath :: {} ][ schemaMappingsPath :: {} ].",
-            new Object[] {customMappingsPath, customRulesPath, dbpediaMappingsPath});
+		logger.info(
+				"The Schema.org Refactoring engine is being activated [ customMappingsPath :: {} ][ customRulesPath :: {} ][ schemaMappingsPath :: {} ].",
+				new Object[] { customMappingsPath, customRulesPath,
+						dbpediaMappingsPath });
 
-        //
-        typeURIs = (String[]) properties.get(TYPE_URIS);
-        if (null == typeURIs || "".equals(typeURIs)) typeURIs = DEFAULT_TYPE_URIS;
+		//
+		typeURIs = (String[]) properties.get(TYPE_URIS);
+		if (null == typeURIs || "".equals(typeURIs))
+			typeURIs = DEFAULT_TYPE_URIS;
 
-        Model schema = FileManager.get().loadModel(dbpediaMappingsPath);
-        Model customMappings = FileManager.get().loadModel(customMappingsPath);
-        schema = schema.add(customMappings);
+		Model schema = FileManager.get().loadModel(dbpediaMappingsPath);
+		Model customMappings = FileManager.get().loadModel(customMappingsPath);
+		schema = schema.add(customMappings);
 
-        List<Rule> rules = Rule.rulesFromURL(customRulesPath);
+		List<Rule> rules = Rule.rulesFromURL(customRulesPath);
 
-        rulesReasoner = new GenericRuleReasoner(rules);
-        ontologyReasoner = ReasonerRegistry.getOWLMicroReasoner();
-        ontologyReasoner = ontologyReasoner.bindSchema(schema);
+		rulesReasoner = new GenericRuleReasoner(rules);
+		ontologyReasoner = ReasonerRegistry.getOWLMicroReasoner();
+		ontologyReasoner = ontologyReasoner.bindSchema(schema);
 
-    }
+	}
 
-    public Graph processGraph(Graph graph, String languageTwoLetterCode) {
-        Model data = ModelFactory.createModelForGraph(graph);
-        Model outputModel = processModel(data, languageTwoLetterCode);
-        return outputModel.getGraph();
-    }
+	public Graph processGraph(final Graph graph,
+			final String languageTwoLetterCode, final Boolean filterLanguage) {
+		final Model data = ModelFactory.createModelForGraph(graph);
+		final Model outputModel = processModel(data, languageTwoLetterCode,
+				filterLanguage);
+		return outputModel.getGraph();
+	}
 
-    private Model processModel(Model data, String languageTwoLetterCode) {
-        Model destinationModel = ModelFactory.createDefaultModel();
-        destinationModel.setNsPrefixes(prefixes);
+	private Model processModel(final Model data,
+			final String languageTwoLetterCode, final Boolean filterLanguage) {
+		final Model destinationModel = ModelFactory.createDefaultModel();
+		destinationModel.setNsPrefixes(prefixes);
 
-        InfModel rulesModel = ModelFactory.createInfModel(rulesReasoner, data);
+		final InfModel rulesModel = ModelFactory.createInfModel(rulesReasoner,
+				data);
 
-        Model sourceModel = ModelFactory.createInfModel(ontologyReasoner, rulesModel);
+		final Model sourceModel = ModelFactory.createInfModel(ontologyReasoner,
+				rulesModel);
 
-        // process each resource type configured in the refactore (e.g. http://schema.org/Person,
-        // http://schema.org/Organization, ...).
-        for (String typeURI : typeURIs)
-            addResourceOfType(sourceModel, typeURI, destinationModel, languageTwoLetterCode);
+		// process each resource type configured in the refactore (e.g.
+		// http://schema.org/Person,
+		// http://schema.org/Organization, ...).
+		for (final String typeURI : typeURIs)
+			addResourceOfType(sourceModel, typeURI, destinationModel,
+					languageTwoLetterCode, filterLanguage);
 
-        // copy all the text annotations.
-        copySubjectsOfType(data, destinationModel, TEXT_ANNOTATION_URI_STRING);
+		// copy all the text annotations.
+		copySubjectsOfType(data, destinationModel, TEXT_ANNOTATION_URI_STRING);
 
-        // copy all the entity annotations.
-        copySubjectsOfType(data, destinationModel, ENTITY_ANNOTATION_URI_STRING);
+		// copy all the entity annotations.
+		copySubjectsOfType(data, destinationModel, ENTITY_ANNOTATION_URI_STRING);
 
-        return destinationModel;
+		return destinationModel;
 
-    }
+	}
 
-    /**
-     * Copy all the text annotations from the source model to the destination model.
-     * 
-     * @param sourceModel
-     *            The source model.
-     * @param destinationModel
-     *            The destination model.
-     */
-    private void copySubjectsOfType(Model sourceModel, Model destinationModel, String typeURI) {
-        Resource typeResource = sourceModel.createResource(typeURI);
-        ResIterator resourcesIterator = sourceModel.listSubjectsWithProperty(RDF.type, typeResource);
+	/**
+	 * Copy all the text annotations from the source model to the destination
+	 * model.
+	 * 
+	 * @param sourceModel
+	 *            The source model.
+	 * @param destinationModel
+	 *            The destination model.
+	 */
+	private void copySubjectsOfType(Model sourceModel, Model destinationModel,
+			String typeURI) {
+		Resource typeResource = sourceModel.createResource(typeURI);
+		ResIterator resourcesIterator = sourceModel.listSubjectsWithProperty(
+				RDF.type, typeResource);
 
-        while (resourcesIterator.hasNext()) {
-            Resource resource = resourcesIterator.nextResource();
-            destinationModel.add(resource.listProperties());
-        }
+		while (resourcesIterator.hasNext()) {
+			Resource resource = resourcesIterator.nextResource();
+			destinationModel.add(resource.listProperties());
+		}
 
-        resourcesIterator.close();
-    }
+		resourcesIterator.close();
+	}
 
-    /**
-     * Get all the resources of the specified type from the sourceModel and copy them to the destinationModel,
-     * keeping only the specified language (where applicable).
-     * 
-     * @param sourceModel
-     *            The source model, containing the triples to be parsed.
-     * @param type
-     *            The entities' type to copy.
-     * @param destinationModel
-     *            The destination model.
-     * @param languageTwoLetterCode
-     *            The two-letters language code to copy (skip the others).
-     */
-    private void addResourceOfType(Model sourceModel,
-                                   String type,
-                                   Model destinationModel,
-                                   String languageTwoLetterCode) {
+	/**
+	 * Get all the resources of the specified type from the sourceModel and copy
+	 * them to the destinationModel, keeping only the specified language (where
+	 * applicable).
+	 * 
+	 * @param sourceModel
+	 *            The source model, containing the triples to be parsed.
+	 * @param type
+	 *            The entities' type to copy.
+	 * @param destinationModel
+	 *            The destination model.
+	 * @param languageTwoLetterCode
+	 *            The two-letters language code to copy (skip the others).
+	 */
+	private void addResourceOfType(final Model sourceModel, final String type,
+			final Model destinationModel, final String languageTwoLetterCode,
+			final Boolean filterLanguage) {
 
-        Resource typeResource = sourceModel.createResource(type);
-        ResIterator resourcesIterator = sourceModel.listSubjectsWithProperty(RDF.type, typeResource);
+		final Resource typeResource = sourceModel.createResource(type);
+		final ResIterator resourcesIterator = sourceModel
+				.listSubjectsWithProperty(RDF.type, typeResource);
 
-        while (resourcesIterator.hasNext()) {
-            Resource resource = resourcesIterator.nextResource();
-            destinationModel.add(resource, RDF.type, typeResource);
-            addProperties(sourceModel, resource, languageTwoLetterCode, destinationModel);
-        }
+		while (resourcesIterator.hasNext()) {
+			final Resource resource = resourcesIterator.nextResource();
+			destinationModel.add(resource, RDF.type, typeResource);
+			addProperties(sourceModel, resource, languageTwoLetterCode,
+					destinationModel, filterLanguage);
+		}
 
-        resourcesIterator.close();
-    }
+		resourcesIterator.close();
+	}
 
-    private void addProperties(Model sourceModel,
-                               Resource subject,
-                               final String languageTwoLetterCode,
-                               Model destinationModel) {
+	private void addProperties(final Model sourceModel, final Resource subject,
+			final String languageTwoLetterCode, final Model destinationModel,
+			final Boolean filterLanguage) {
 
-        // select only statements that are http://schema.org/ or the entityhub query score.
-        StmtIterator statementsIterator = sourceModel.listStatements(new SimpleSelector(subject, null,
-                (RDFNode) null) {
-            public boolean selects(Statement s) {
-                if (s.getObject().isLiteral()
-                    && (!languageTwoLetterCode.equals(s.getLanguage()) && !"".equals(s.getLanguage()))) {
-                    return false;
-                }
+		// select only statements that are http://schema.org/ or the entityhub
+		// query score.
+		StmtIterator statementsIterator = sourceModel
+				.listStatements(new SimpleSelector(subject, null,
+						(RDFNode) null) {
+					public boolean selects(Statement s) {
+						if (filterLanguage
+								&& s.getObject().isLiteral()
+								&& (!languageTwoLetterCode.equals(s
+										.getLanguage()) && !"".equals(s
+										.getLanguage()))) {
+							return false;
+						}
 
-                String predicateURI = s.getPredicate().getURI();
-                if (predicateURI.startsWith("http://schema.org/")) return true;
-                if ("http://stanbol.apache.org/ontology/entityhub/query#score".equals(predicateURI)) return true;
+						String predicateURI = s.getPredicate().getURI();
+						if (predicateURI.startsWith("http://schema.org/"))
+							return true;
+						if ("http://stanbol.apache.org/ontology/entityhub/query#score"
+								.equals(predicateURI))
+							return true;
 
-                return false;
-            }
-        });
+						return false;
+					}
+				});
 
-        while (statementsIterator.hasNext()) {
-            Statement statement = statementsIterator.nextStatement();
-            destinationModel.add(statement);
-        }
+		while (statementsIterator.hasNext()) {
+			Statement statement = statementsIterator.nextStatement();
+			destinationModel.add(statement);
+		}
 
-    }
+	}
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 }

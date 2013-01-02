@@ -35,6 +35,7 @@
 							io.insideout.wordlift.org.apache.stanbol.enhancer.engines.schemaorg;version=${project.version},
 							io.insideout.wordlift.org.apache.stanbol.domain;version=${project.version},
 							io.insideout.wordlift.org.apache.stanbol.services;version=${project.version},
+							io.insideout.stanbol.facade.models;version=${stanbol-facade-version},
 							org.osgi.framework.*,
 							com.hp.hpl.jena.*,
 							org.apache.clerezza.rdf.core.*,
@@ -53,6 +54,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.insideout</groupId>
+			<artifactId>stanbol-facade-api</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.stanbol</groupId>
 			<artifactId>org.apache.stanbol.enhancer.servicesapi</artifactId>
