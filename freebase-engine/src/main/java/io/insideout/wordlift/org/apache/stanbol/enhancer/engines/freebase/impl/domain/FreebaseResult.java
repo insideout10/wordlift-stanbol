@@ -5,84 +5,97 @@ import java.util.Collection;
 import com.google.gson.annotations.SerializedName;
 
 public class FreebaseResult {
-    /*
-     * "mid": "/m/06c62", "name": "Roma", "notable": { "name": "Citt\u00e0/Cittadina/Villaggio", "id":
-     * "/location/citytown" }, "lang": "it", "score": 37.547695 },
-     */
+	/*
+	 * "mid": "/m/06c62", "name": "Roma", "notable": { "name":
+	 * "Citt\u00e0/Cittadina/Villaggio", "id": "/location/citytown" }, "lang":
+	 * "it", "score": 37.547695 },
+	 */
 
-    private String id;
-    private String mid;
-    private String name;
-    private String language;
-    @SerializedName("relevance:score") 
-    private Double score;
+	private String id;
+	private String mid;
+	private String name;
+	private String language;
+	@SerializedName("relevance:score")
+	private Double score;
 
-    private Collection<FreebaseType> type;
+	private FreebaseKey key;
 
-    private FreebaseNotable notable;
+	private Collection<FreebaseType> type;
 
-    public FreebaseResult() {}
+	private FreebaseNotable notable;
 
-    public String getId() {
-        return id;
-    }
+	public FreebaseResult() {
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getLanguage() {
-        return language;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+	public String getLanguage() {
+		return language;
+	}
 
-    public Double getScore() {
-        return score;
-    }
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 
-    public void setScore(Double score) {
-        this.score = score;
-    }
+	public Double getScore() {
+		return score;
+	}
 
-    public String getMid() {
-        return mid;
-    }
+	public void setScore(Double score) {
+		this.score = score;
+	}
 
-    public void setMid(String mid) {
-        this.mid = mid;
-    }
+	public String getMid() {
+		return mid;
+	}
 
-    public Collection<FreebaseType> getType() {
-        return type;
-    }
+	public void setMid(String mid) {
+		this.mid = mid;
+	}
 
-    public void setType(Collection<FreebaseType> type) {
-        this.type = type;
-    }
+	public Collection<FreebaseType> getType() {
+		return type;
+	}
 
-    public FreebaseNotable getNotable() {
-        return notable;
-    }
+	public void setType(Collection<FreebaseType> type) {
+		this.type = type;
+	}
 
-    public void setNotable(FreebaseNotable notable) {
-        this.notable = notable;
-    }
+	public FreebaseNotable getNotable() {
+		return notable;
+	}
 
-    @Override
-    public String toString() {
-        return "FreebaseResult [id=" + id + ", mid=" + mid + ", name=" + name + ", language=" + language
-               + ", score=" + score + ", type=" + type + ", notable=" + notable + "]";
-    }
+	public void setNotable(FreebaseNotable notable) {
+		this.notable = notable;
+	}
+
+	@Override
+	public String toString() {
+		return "FreebaseResult [id=" + id + ", mid=" + mid + ", name=" + name
+				+ ", language=" + language + ", score=" + score + ", type="
+				+ type + ", notable=" + notable + "]";
+	}
+
+	public FreebaseKey getKey() {
+		return key;
+	}
+
+	public void setKey(FreebaseKey key) {
+		this.key = key;
+	}
 
 }

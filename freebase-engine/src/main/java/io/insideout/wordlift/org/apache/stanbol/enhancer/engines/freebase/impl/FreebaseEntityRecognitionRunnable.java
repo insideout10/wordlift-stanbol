@@ -8,7 +8,6 @@ import java.util.Collection;
 import org.apache.stanbol.enhancer.servicesapi.ContentItem;
 import org.apache.stanbol.entityhub.servicesapi.model.Entity;
 import org.apache.stanbol.entityhub.servicesapi.query.FieldQuery;
-import org.apache.stanbol.entityhub.servicesapi.query.QueryResultList;
 import org.apache.stanbol.entityhub.servicesapi.site.Site;
 import org.apache.stanbol.entityhub.servicesapi.site.SiteException;
 import org.slf4j.Logger;
@@ -29,13 +28,15 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 	private double freebaseSearchMinimumScore;
 	private int freebaseSearchLimit;
 
-	public FreebaseEntityRecognitionRunnable(TextAnnotation textAnnotation,
-			Site site, FreebaseEntityRecognition freebaseEntityRecognition,
-			ContentItem contentItem, String defaultLanguage,
-			String freebaseURI,
-			FreebaseEntityRecognitionEngine entityRecognitionEngine,
-			double minimumScore, double freebaseSearchMinimumScore,
+	public FreebaseEntityRecognitionRunnable(
+			final TextAnnotation textAnnotation, final Site site,
+			final FreebaseEntityRecognition freebaseEntityRecognition,
+			final ContentItem contentItem, final String defaultLanguage,
+			final String freebaseURI,
+			final FreebaseEntityRecognitionEngine entityRecognitionEngine,
+			final double minimumScore, final double freebaseSearchMinimumScore,
 			int freebaseSearchLimit) {
+
 		this.textAnnotation = textAnnotation;
 		this.site = site;
 		this.freebaseEntityRecognition = freebaseEntityRecognition;
@@ -51,9 +52,10 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 	@Override
 	public void run() {
 
-		String text = textAnnotation.getText();
-		String language = (textAnnotation.getLanguageTwoLetterCode().isEmpty() ? defaultLanguage
-				: textAnnotation.getLanguageTwoLetterCode());
+		final String text = textAnnotation.getText();
+		final String language = (textAnnotation.getLanguageTwoLetterCode()
+				.isEmpty() ? defaultLanguage : textAnnotation
+				.getLanguageTwoLetterCode());
 
 		logger.trace("Running new search thread [text :: {}][language :: {}].",
 				text, language);
@@ -61,7 +63,7 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 		// -- CUT --
 
 		// perform the actual search.
-		Collection<FreebaseResult> results = freebaseEntityRecognition
+		final Collection<FreebaseResult> results = freebaseEntityRecognition
 				.extractEntities(text, language, freebaseSearchMinimumScore,
 						freebaseSearchLimit);
 
@@ -69,10 +71,16 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 		if (null == results)
 			return;
 
-		double maxScore = getMaxScore(results);
+		final double maxScore = getMaxScore(results);
 
-		for (FreebaseResult result : results) {
-			String sameAsReference = freebaseURI
+		for (final FreebaseResult result : results) {
+
+			// go to the next result if the score is too low.
+			double score = result.getScore() / maxScore;
+			if (score < entityMinimumScore)
+				continue;
+
+			final String sameAsReference = freebaseURI
 					+ result.getMid().replace("/m/", "/m.");
 
 			// // ##### E N T I T Y H U B Q U E R Y I N G #####
@@ -96,14 +104,34 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 			// new Object[] {e.getClass(), sameAsReference, e.getMessage()}, e);
 			// }
 
-			FieldQuery fieldQuery = site.getQueryFactory().createFieldQuery();
+			final FieldQuery fieldQuery = site.getQueryFactory()
+					.createFieldQuery();
 
 			entityRecognitionEngine.setFieldQueryParameters(fieldQuery,
 					sameAsReference, language);
 
-			QueryResultList<Entity> entities = null;
+			// QueryResultList<Entity> entities = null;
 			try {
-				entities = site.findEntities(fieldQuery);
+				if (null == result.getKey())
+					continue;
+				final String about = "http://dbpedia.org/resource/"
+						+ result.getKey().getValue();
+
+				logger.trace(String.format(
+						"Looking for an entity [ about :: %s ]", about));
+				final Entity entity = site.getEntity(about);
+
+				if (null == entity) {
+					logger.debug(String.format(
+							"No entity found for [ about :: %s ].", about));
+					continue;
+				}
+
+				logger.debug("Entity found.");
+
+				// entities = site.findEntities(fieldQuery);
+				entityRecognitionEngine.writeEntity(contentItem, entity,
+						language, textAnnotation, score, false, null);
 			} catch (SiteException e) {
 				logger.error(
 						"An Site exception occured [{}] while looking for entities for [{}]:\n{}",
@@ -114,22 +142,16 @@ public class FreebaseEntityRecognitionRunnable implements Runnable {
 				continue;
 			}
 
-			logger.trace("Found [{}] entities via the Site for [{}].",
-					new Object[] { entities.size(), sameAsReference });
-			double score = result.getScore() / maxScore;
+			// logger.trace("Found [{}] entities via the Site for [{}].",
+			// new Object[] { entities.size(), sameAsReference });
 
-			if (score < entityMinimumScore)
-				continue;
-
-			entityRecognitionEngine.writeEntities(contentItem, entities,
-					language, textAnnotation, score);
 		}
 
 	}
 
-	private double getMaxScore(Collection<FreebaseResult> results) {
+	private double getMaxScore(final Collection<FreebaseResult> results) {
 		double maxScore = 0.0;
-		for (FreebaseResult result : results)
+		for (final FreebaseResult result : results)
 			if (maxScore < result.getScore())
 				maxScore = result.getScore();
 

@@ -64,15 +64,16 @@ public class FreebaseEntityRecognitionImpl implements FreebaseEntityRecognition 
 			final String language, final double freebaseSearchMinimumScore,
 			final int freebaseSearchLimit) {
 
-		FreebaseSearchOptions freebaseSearchOptions = new FreebaseSearchOptions();
+		final FreebaseSearchOptions freebaseSearchOptions = new FreebaseSearchOptions();
 		freebaseSearchOptions.setLang(language);
 		freebaseSearchOptions.setIndent(indent);
 		freebaseSearchOptions.setLimit(freebaseSearchLimit);
 		freebaseSearchOptions.setKey(key);
 		freebaseSearchOptions
-				.setMqlOutput("{\"id\":null, \"mid\":null, \"name\":null, \"type\":[{\"id\":null,\"name\":null}]}}");
+				.setMqlOutput("{\"id\":null, \"mid\":null, \"key\": {\"namespace\":\"/wikipedia/en_title\", \"value\": null}, \"name\":null, \"type\":[{\"id\":null,\"name\":null}]}}");
+		freebaseSearchOptions.setFilter("(any namespace:/wikipedia/en_title)");
 
-		FreebaseSearch freebaseSearch = new FreebaseSearch();
+		final FreebaseSearch freebaseSearch = new FreebaseSearch();
 		return filterResultsByMinScore(
 				freebaseSearch.search(query, freebaseSearchOptions),
 				freebaseSearchMinimumScore);
@@ -80,15 +81,15 @@ public class FreebaseEntityRecognitionImpl implements FreebaseEntityRecognition 
 	}
 
 	private Collection<FreebaseResult> filterResultsByMinScore(
-			Collection<FreebaseResult> results,
+			final Collection<FreebaseResult> results,
 			final double freebaseSearchMinimumScore) {
 
 		if (null == results)
 			return null;
 
-		Set<FreebaseResult> resultsToRemove = new HashSet<FreebaseResult>();
+		final Set<FreebaseResult> resultsToRemove = new HashSet<FreebaseResult>();
 
-		for (FreebaseResult result : results)
+		for (final FreebaseResult result : results)
 			if (freebaseSearchMinimumScore > result.getScore())
 				resultsToRemove.add(result);
 

@@ -23,48 +23,56 @@ import com.google.gson.Gson;
 
 public class FreebaseSearch {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final String endPointURL = "https://www.googleapis.com/freebase/v1/search";
+	private final String endPointURL = "https://www.googleapis.com/freebase/v1/search";
 
-    public Collection<FreebaseResult> search(String query, FreebaseSearchOptions options) {
+	public Collection<FreebaseResult> search(final String query,
+			final FreebaseSearchOptions options) {
 
-        if (null == query || query.isEmpty()) throw new RuntimeException("The query cannot be empty.");
+		if (null == query || query.isEmpty())
+			throw new RuntimeException("The query cannot be empty.");
 
-        String responseBody = null;
-        try {
-            URIBuilder uriBuilder = new URIBuilder(endPointURL);
-            uriBuilder.addParameter("query", query);
-            options.addParametersToUriBuilder(uriBuilder);
-            HttpGet httpGet = new HttpGet(uriBuilder.build());
+		String responseBody = null;
+		try {
+			URIBuilder uriBuilder = new URIBuilder(endPointURL);
+			uriBuilder.addParameter("query", query);
+			options.addParametersToUriBuilder(uriBuilder);
+			HttpGet httpGet = new HttpGet(uriBuilder.build());
 
-            logger.info("Going to query Freebase [{}].", httpGet.getURI());
+			logger.info("Going to query Freebase [{}].", httpGet.getURI());
 
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            HttpEntity httpEntity = httpResponse.getEntity();
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpResponse httpResponse = httpClient.execute(httpGet);
+			HttpEntity httpEntity = httpResponse.getEntity();
 
-            responseBody = EntityUtils.toString(httpEntity);
+			responseBody = EntityUtils.toString(httpEntity);
 
-        } catch (URISyntaxException e) {
-            logger.error("An exception [{}] occured:\n{}", new Object[] {e.getClass(), e.getMessage()}, e);
-            throw new RuntimeException(e);
-        } catch (ClientProtocolException e) {
-            logger.error("An exception [{}] occured:\n{}", new Object[] {e.getClass(), e.getMessage()}, e);
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            logger.error("An exception [{}] occured:\n{}", new Object[] {e.getClass(), e.getMessage()}, e);
-            throw new RuntimeException(e);
-        }
+		} catch (URISyntaxException e) {
+			logger.error("An exception [{}] occured:\n{}",
+					new Object[] { e.getClass(), e.getMessage() }, e);
+			throw new RuntimeException(e);
+		} catch (ClientProtocolException e) {
+			logger.error("An exception [{}] occured:\n{}",
+					new Object[] { e.getClass(), e.getMessage() }, e);
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			logger.error("An exception [{}] occured:\n{}",
+					new Object[] { e.getClass(), e.getMessage() }, e);
+			throw new RuntimeException(e);
+		}
 
-        Gson gson = new Gson();
-        FreebaseResponse freebaseResponse = gson.fromJson(responseBody, FreebaseResponse.class);
+		final Gson gson = new Gson();
+		final FreebaseResponse freebaseResponse = gson.fromJson(responseBody,
+				FreebaseResponse.class);
 
-        if (null == freebaseResponse || null == freebaseResponse.getResult()) return null;
+		if (null == freebaseResponse || null == freebaseResponse.getResult())
+			return null;
 
-        logger.info("Found [{}] result(s).", freebaseResponse.getResult().size());
+		logger.info("Found [{}] result(s).", freebaseResponse.getResult()
+				.size());
 
-        return freebaseResponse.getResult();
+		return freebaseResponse.getResult();
 
-    }
+	}
 }
