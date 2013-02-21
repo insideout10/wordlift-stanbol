@@ -26,7 +26,7 @@ public class TextAnnotationsModelEngine extends AbstractEnhancementEngine<Runtim
         implements EnhancementEngine, ServiceProperties {
 
     // the order in which this engine is executed.
-    public static final Integer ENGINE_ORDER = ServiceProperties.ORDERING_CONTENT_EXTRACTION - 20;
+    public static final Integer ENGINE_ORDER = ServiceProperties.ORDERING_POST_PROCESSING - 20;
 
     // a reference to the actual TextAnnotationsModelService that is going to perform the enhancements.
     @Reference
